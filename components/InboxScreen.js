@@ -105,11 +105,14 @@ export default class InboxScreen extends Component {
         this.shouldPlayAtEndOfSeek = false;
         this.playbackInstance = null;
         this.state = {
-          messages: [],
-          shouldPlay: false,
-          shouldCorrectPitch: true,
-          feedback: ""
+            activeMessage: null,
+            isPlaying: false,
+            messages: [],
+            shouldPlay: false,
+            shouldCorrectPitch: true,
+            feedback: ""
         };
+        this._onPlaybackStatusUpdate = this._onPlaybackStatusUpdate.bind(this);
     }
 
     componentDidMount() {
@@ -213,8 +216,17 @@ export default class InboxScreen extends Component {
         message.playbackInstance = sound;
     }
 
-    _onPlaybackStatusUpdate() {
-        
+    _onPlaybackStatusUpdate = status => {
+        if (status.didJustFinish) {
+            this.setState({feedback: JSON.stringify(status)});
+            var updatedMessages = this.state.messages.slice();
+            updatedMessages[this.state.activeMessage].isPlaying = false;
+            this.setState({
+                activeMessage: null,
+                isPlaying: false,
+                messages: updatedMessages
+            });
+        }
     }
 
     _onLoadStart = () => {
@@ -322,13 +334,18 @@ export default class InboxScreen extends Component {
                               underlayColor={BACKGROUND_COLOR}
                               size={BUTTON_HEIGHT}
                               onPress={() => {
-                                  this.index = index;
-                                  var updatedMessages = this.state.messages.slice();
-                                  updatedMessages[index].isPlaying = true;
-                                  this.setState({messages: updatedMessages});
-                                  item.playbackInstance.playAsync();
+                                  if (!this.state.isPlaying) {
+                                      this.index = index;
+                                      var updatedMessages = this.state.messages.slice();
+                                      updatedMessages[index].isPlaying = true;
+                                      this.setState({
+                                          activeMessage: index,
+                                          isPlaying: true,
+                                          messages: updatedMessages
+                                      });
+                                      item.playbackInstance.playAsync();
+                                  }
                               }}
-                              disabled={item.isLoading}
                           />}
                             {item.isPlaying &&
                             <Ionicons
@@ -338,7 +355,10 @@ export default class InboxScreen extends Component {
                               onPress={() => {
                                   var updatedMessages = this.state.messages.slice();
                                   updatedMessages[index].isPlaying = false;
-                                  this.setState({messages: updatedMessages});
+                                  this.setState({
+                                      isPlaying: false,
+                                      messages: updatedMessages
+                                  });
                                   item.playbackInstance.pauseAsync();
                               }} />}
                             <Slider
