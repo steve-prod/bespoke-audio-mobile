@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AsyncStorage, Button, Text, TextInput, View } from 'react-native';
+import { AsyncStorage, Button, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default class LoginScreen extends Component {
     constructor(props) {
@@ -43,16 +43,16 @@ export default class LoginScreen extends Component {
 
     render() {
         return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={styles.login}>
                 <Text>Please log in</Text>
                 <TextInput
-                    style={{height: 40, width:300, borderColor: 'gray', borderWidth: 1}}
+                    style={styles.loginButton}
                     placeholder="Email"
                     type="email"
                     onChangeText={(email) => this.setState({email: email})}
                 />
                 <TextInput
-                    style={{height: 40, width:300, borderColor: 'gray', borderWidth: 1}}
+                    style={styles.loginButton}
                     placeholder="Password"
                     secureTextEntry={true}
                     onChangeText={(password) => this.setState({password: password})}
@@ -93,3 +93,17 @@ export default class LoginScreen extends Component {
         );
     };
 }
+
+const styles = StyleSheet.create({
+    login: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    loginButton: {
+        height: 40,
+        width:300,
+        borderColor: 'gray',
+        borderWidth: 1
+    }
+});

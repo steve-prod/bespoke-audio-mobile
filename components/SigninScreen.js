@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Button, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
 
 export default class SigninScreen extends Component {
     render() {
         return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={styles.signin}>
                 <Text>Signin View</Text>
                 <Button
                     title="Go to LoginScreen"
@@ -18,3 +18,11 @@ export default class SigninScreen extends Component {
         );
     };
 }
+
+const styles = StyleSheet.create({
+    signin: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+    }
+});
