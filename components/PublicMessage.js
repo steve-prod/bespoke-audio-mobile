@@ -1,31 +1,31 @@
 import React, { Component } from 'react';
 import {
-    AsyncStorage,
     Button,
     Dimensions,
-    FlatList,
     Slider,
     StyleSheet,
     Text,
     View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
-import { Asset, Audio, Font } from 'expo';
+import { Audio } from 'expo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import base64 from 'base-64';
 
 const BUTTON_HEIGHT = 50;
 
 const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get('window');
-const BACKGROUND_COLOR = '#FFF8ED';
 const DISABLED_OPACITY = 0.5;
 const FONT_SIZE = 14;
 const LOADING_STRING = '... loading ...';
 const BUFFERING_STRING = '...buffering...';
 
-export default class Message extends Component {
+export default class PublicMessage extends Component {
     constructor(props) {
         super(props);
         this.isSeeking = false;
         this.shouldPlayAtEndOfSeek = false;
+        var tags = base64.decode(this.props.tags).replace(/'/g, "\"");
+        tags = tags.slice(2, tags.length - 2).split(",").join(", ");
         this.state = {
             info: "",
             shouldPlay: false,
@@ -35,7 +35,8 @@ export default class Message extends Component {
             playbackInstancePosition: 0,
             playbackInstanceDuration: 0,
             isPlaying: false,
-            isBuffering: true
+            isBuffering: true,
+            tags: tags
         };
     }
 
@@ -55,6 +56,7 @@ export default class Message extends Component {
         const initialStatus = {
           shouldPlay: false,
           shouldCorrectPitch: this.state.shouldCorrectPitch,
+          progressUpdateIntervalMillis: 10
           // // UNCOMMENT THIS TO TEST THE OLD androidImplementation:
           // androidImplementation: 'MediaPlayer',
         };
@@ -67,7 +69,7 @@ export default class Message extends Component {
             this.setState({
                 isBuffering: false,
                 playbackInstance: sound,
-                playbackInstanceDuration: Math.floor(status.playableDurationMillis / 1000)
+                playbackInstanceDuration: Math.floor(status.playableDurationMillis / 1000),
             })
         } catch (e) {
             // this.setState({info: JSON.stringify(e)});
@@ -157,14 +159,13 @@ export default class Message extends Component {
         return (
             <View style={styles.messageContainer}>
                 <View style={styles.fromContainer}>
-                    <Text>From: {this.props.creatorID}</Text>
+                    <Text>Tags: {this.state.tags}</Text>
                 </View>
                 <View style={[styles.playerContainer,{opacity: 1.0}]}>
                     {!this.state.isPlaying &&
                     <Ionicons
                         style={styles.playerButton}
                         name="ios-play"
-                        underlayColor={BACKGROUND_COLOR}
                         size={BUTTON_HEIGHT}
                         onPress={() => {
                           if (!this.state.isPlaying) {
@@ -177,7 +178,6 @@ export default class Message extends Component {
                     <Ionicons
                         style={styles.playerButton}
                         name="ios-pause"
-                        underlayColor={BACKGROUND_COLOR}
                         size={BUTTON_HEIGHT}
                         onPress={() => {
                           this.setState({isPlaying: false});
@@ -206,8 +206,10 @@ export default class Message extends Component {
 
 const styles = StyleSheet.create({
     messageContainer: {
-      marginTop: 20,
-      marginHorizontal: 30,
+      paddingTop: 20,
+      paddingHorizontal: 20,
+      borderBottomWidth: 1,
+      padding: 20
     },
     fromContainer: {
         // marginLeft: 10

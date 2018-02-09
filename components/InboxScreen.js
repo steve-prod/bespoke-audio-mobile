@@ -3,15 +3,13 @@ import {
     AsyncStorage,
     Button,
     Dimensions,
-    FlatList,
-    Slider,
     StyleSheet,
     Text,
     View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { Asset, Audio, Font } from 'expo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Message from './Message.js';
+import PrivateMessageList from './PrivateMessageList.js';
 
 const resetAction = NavigationActions.reset({
     index: 0,
@@ -19,49 +17,26 @@ const resetAction = NavigationActions.reset({
 });
 
 const BACKGROUND_COLOR = '#FFF8ED';
+const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get('window');
 
 export default class InboxScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            messages: [],
             feedback: ""
         };
     }
 
     componentDidMount() {
-        this.load();
+        this.doesValidSessionExist();
     }
 
-    getMessages() {
-        var that = this;
-        var messagesXHR = new XMLHttpRequest();
-        messagesXHR.addEventListener('load', (event) => {
-            if (event.target.status === 200) {
-                this.setState({messages: JSON.parse(event.target.responseText)});
-            } else {
-                // TODO: alert user login failed
-                alert(event.target.status);
-                alert(event.target.responseText);
-            }
-        });
-        messagesXHR.addEventListener('error', function(event) {
-            // TODO: alert user login failed
-            alert(event.target.status)
-        });
-        messagesXHR.open('GET', 'https://bespoke-audio.com/messages');
-        messagesXHR.setRequestHeader('Accept', 'application/json');
-        messagesXHR.send();
-    }
-
-    load = async () => {
+    doesValidSessionExist = async () => {
         try {
             const session = await AsyncStorage.getItem('session')
             if (session === null) {
                 this.props.navigation.navigate('Login')
             }
-            // Get messages or goto login
-            this.getMessages();
         } catch (e) {
             try {
                 async (session) => {
@@ -99,15 +74,10 @@ export default class InboxScreen extends Component {
     render() {
         return (
             <View style={styles.inbox}>
-                <Text style={styles.inboxText}>Inbox</Text>
-                <FlatList
-                    style={styles.inboxFlatList}
-                    data={this.state.messages}
-                    keyExtractor={ (item, index) => item.messageID}
-                    renderItem={({item}) => (
-                        <Message messageID={item.messageID} creatorID={item.creatorID} />
-                    )}
-                />
+                <View style={styles.inboxText}>
+                    <Text>Inbox</Text>
+                </View>
+                <PrivateMessageList />
                 <Text>{this.state.feedback}</Text>
                 <Button
                     title="Go to Message Details"
@@ -120,11 +90,11 @@ export default class InboxScreen extends Component {
 
 const styles = StyleSheet.create({
     inbox: {
-        paddingTop: 10,
         backgroundColor: BACKGROUND_COLOR,
         flex: 1,
     },
     inboxText: {
-        alignSelf: 'center'
+        paddingVertical: 10,
+        alignSelf: 'center',
     }
 });

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { AsyncStorage, Button } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { TabNavigator, TabBarBottom, StackNavigator } from 'react-navigation';
 import DetailsScreen from './DetailsScreen.js';

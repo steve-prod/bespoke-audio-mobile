@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
-import { AsyncStorage, Button, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
+import PublicMessageList from './PublicMessageList.js';
 
 const resetAction = NavigationActions.reset({
     index: 0,
     actions: [NavigationActions.navigate({ routeName: 'Login'})]
 });
 
+const BACKGROUND_COLOR = '#FFF8ED';
 
 export default class BrowseScreen extends Component {
     static navigationOptions = ({navigation, navigationOptions}) => {
@@ -33,16 +35,11 @@ export default class BrowseScreen extends Component {
 
     render() {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Browse</Text>
-                <Button
-                    title="Go to Inbox"
-                    onPress={() => this.props.navigation.navigate('Inbox')}
-                />
-                <Button
-                    title="Go to Recorder"
-                    onPress={() => this.props.navigation.navigate('Recorder')}
-                />
+            <View style={styles.browse}>
+                <View style={styles.browseText}>
+                    <Text>Browse</Text>
+                </View>
+                <PublicMessageList />
                 <Button
                     title="Go to Message Details"
                     onPress={() => this.props.navigation.navigate('Details')}
@@ -51,3 +48,14 @@ export default class BrowseScreen extends Component {
         );
     }
 }
+
+const styles = StyleSheet.create({
+    browse: {
+        backgroundColor: BACKGROUND_COLOR,
+        flex: 1,
+    },
+    browseText: {
+        paddingVertical: 10,
+        alignSelf: 'center',
+    }
+});
