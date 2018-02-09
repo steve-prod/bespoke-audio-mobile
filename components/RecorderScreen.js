@@ -1,11 +1,20 @@
 import React, { Component } from 'react';
-import { AsyncStorage, Button, Text, View } from 'react-native';
+import {
+    AsyncStorage,
+    Button,
+    Dimensions,
+    StyleSheet,
+    Text,
+    View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 
 const resetAction = NavigationActions.reset({
     index: 0,
     actions: [NavigationActions.navigate({ routeName: 'Login'})]
 });
+
+const BACKGROUND_COLOR = '#FFF8ED';
+const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get('window');
 
 export default class RecorderScreen extends Component {
     constructor(props) {
@@ -37,18 +46,26 @@ export default class RecorderScreen extends Component {
 
     render() {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Recorder</Text>
+            <View style={styles.recorder}>
+                <View style={styles.recorderText}>
+                    <Text>Recorder</Text>
+                </View>
                 <Text>{this.state.response}</Text>
-                <Button
-                    title="Go to Inbox"
-                    onPress={() => this.props.navigation.navigate('Inbox')}
-                />
-                <Button
-                    title="Go to Browse"
-                    onPress={() => this.props.navigation.navigate('Browse')}
-                />
+                
             </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    recorder: {
+        flex: 1,
+        backgroundColor: BACKGROUND_COLOR,
+        // justifyContent: 'center',
+        // alignItems: 'center'
+    },
+    recorderText: {
+        paddingVertical: 10,
+        alignSelf: 'center',
+    }
+});
