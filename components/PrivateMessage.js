@@ -184,7 +184,8 @@ export default class PrivateMessage extends Component {
                     <Text style={[styles.text, styles.buffering]}>
                         {BUFFERING_STRING}
                     </Text>}
-                    {!this.state.isBuffering &&<Slider
+                    {!this.state.isBuffering &&
+                    <Slider
                       style={styles.playerSlider}
                       value={this.state.playbackInstancePosition/this.state.playbackInstanceDuration}
                       onValueChange={this._onSeekSliderValueChange}

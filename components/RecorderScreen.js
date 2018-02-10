@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
-import {
-    AsyncStorage,
-    Button,
-    Dimensions,
-    StyleSheet,
-    Text,
-    View } from 'react-native';
+import { AsyncStorage, Button, Dimensions, StyleSheet, Text, View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
+import Recorder from './Recorder.js';
 
 const resetAction = NavigationActions.reset({
     index: 0,
@@ -17,10 +12,6 @@ const BACKGROUND_COLOR = '#FFF8ED';
 const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get('window');
 
 export default class RecorderScreen extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {response: ""};
-    }
 
     static navigationOptions = ({navigation, navigationOptions}) => {
         return {
@@ -46,23 +37,20 @@ export default class RecorderScreen extends Component {
 
     render() {
         return (
-            <View style={styles.recorder}>
+            <View style={styles.recorderScreen}>
                 <View style={styles.recorderText}>
                     <Text>Recorder</Text>
                 </View>
-                <Text>{this.state.response}</Text>
-                
+                <Recorder />
             </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    recorder: {
+    recorderScreen: {
         flex: 1,
         backgroundColor: BACKGROUND_COLOR,
-        // justifyContent: 'center',
-        // alignItems: 'center'
     },
     recorderText: {
         paddingVertical: 10,

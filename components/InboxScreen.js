@@ -7,7 +7,7 @@ import {
     Text,
     View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
-import { Asset, Audio, Font } from 'expo';
+import { Audio } from 'expo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import PrivateMessageList from './PrivateMessageList.js';
 
