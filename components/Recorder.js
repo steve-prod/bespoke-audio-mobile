@@ -5,6 +5,7 @@ import {
   Slider,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import Expo, { Audio, FileSystem, Permissions } from 'expo';
@@ -36,8 +37,10 @@ export default class Recorder extends Component {
       isPlaying: false,
       isRecording: false,
       shouldCorrectPitch: true,
+      recipientEmail: "",
     };
     this.recordingSettings = JSON.parse(JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY));
+    this._sendPrivateMessage = this._sendPrivateMessage.bind(this);
     // // UNCOMMENT THIS TO TEST maxFileSize:
     // this.recordingSettings.android['maxFileSize'] = 12000;
   }
@@ -241,6 +244,32 @@ export default class Recorder extends Component {
     return `${this._getMMSSFromMillis(0)}`;
   }
 
+  _sendPrivateMessage() {
+      var that = this;
+      var formData = new FormData();
+      formData.append("blob", {uri:that.recording.getURI(), name:"blob", type:"audio/x-caf"});
+      formData.append("recipient", that.state.recipientEmail);
+      formData.append("isPublic", false);
+      console.log(formData);
+      var resetsXHR = new XMLHttpRequest();
+      resetsXHR.addEventListener('load', function(event) {
+          if (event.target.status === 201) {
+              // TODO: alert user upload was successful
+          } else {
+              // TODO: alert user login failed
+              alert(event.target.responseText);
+              alert("200 error: messageFromServer");
+          }
+      });
+      resetsXHR.addEventListener('error', function(event) {
+          // TODO: alert user login failed
+          alert(event.target.status)
+          alert("XHR Error: eventMessage")
+      });
+      resetsXHR.open('POST', 'https://bespoke-audio.com/messages');
+      resetsXHR.send(formData);
+  }
+
   render() {
     return !this.state.haveRecordingPermissions ? (
       <View style={styles.recorderContainer}>
@@ -295,133 +324,57 @@ export default class Recorder extends Component {
               </Text>
           </View>
         </View>
+        <View>
+            <TextInput
+                style={styles.recipientInput}
+                placeholder="Recipient email here"
+                onChangeText={(text) => this.setState({recipientEmail: text})}
+            />
+        </View>
+        <View style={styles.sendButtonContainer}>
+            <Button
+                title={"Send Message"}
+                size={BUTTON_HEIGHT}
+                onPress={this._sendPrivateMessage}
+                disabled={this.state.isLoading}
+                style={styles.sendPrivateMessageButton}
+            />
+        </View>
       </View>
     );
   }
 }
 
-// const styles = StyleSheet.create({
-//   emptyContainer: {
-//     alignSelf: 'stretch',
-//     backgroundColor: BACKGROUND_COLOR,
-//   },
-//   container: {
-//     flex: 1,
-//     flexDirection: 'column',
-//     justifyContent: 'flex-start', // was space-between
-//     alignItems: 'center',
-//     // alignSelf: 'stretch',
-//     backgroundColor: BACKGROUND_COLOR,
-//     minHeight: DEVICE_HEIGHT,
-//     maxHeight: DEVICE_HEIGHT,
-//   },
-//   noPermissionsText: {
-//     textAlign: 'center',
-//   },
-//   wrapper: {},
-//   halfScreenContainer: {
-//     flex: 1,
-//     flexDirection: 'column',
-//     justifyContent: 'flex-start', // was space-between
-//     alignItems: 'center',
-//     alignSelf: 'stretch',
-//     // minHeight: DEVICE_HEIGHT / 2.0,
-//     // maxHeight: DEVICE_HEIGHT / 2.0,
-//   },
-//   recordingContainer: {
-//     flex: 1,
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     alignSelf: 'stretch',
-//     minHeight: BUTTON_HEIGHT,
-//     maxHeight: BUTTON_HEIGHT,
-//   },
-//   recordingDataContainer: {
-//     flex: 1,
-//     flexDirection: 'column',
-//     justifyContent: 'flex-start', // was space-between
-//     alignItems: 'center',
-//     minHeight: BUTTON_HEIGHT,
-//     maxHeight: BUTTON_HEIGHT,
-//     minWidth: BUTTON_HEIGHT * 3.0,
-//     maxWidth: BUTTON_HEIGHT * 3.0,
-//   },
-//   recordingDataRowContainer: {
-//     flex: 1,
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     minHeight: BUTTON_HEIGHT,
-//     maxHeight: BUTTON_HEIGHT,
-//   },
-//   recordingIcon: {
-//     color: LIVE_COLOR
-//   },
-//   playbackContainer: {
-//     flex: 1,
-//     flexDirection: 'column',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     alignSelf: 'stretch',
-//     minHeight: BUTTON_HEIGHT * 2.0,
-//     maxHeight: BUTTON_HEIGHT * 2.0,
-//   },
-//   playbackSlider: {
-//     alignSelf: 'stretch',
-//   },
-//   liveText: {
-//     color: LIVE_COLOR,
-//   },
-//   recordingTimestamp: {
-//     paddingLeft: 20,
-//   },
-  // playbackTimestamp: {
-  //   textAlign: 'right',
-  //   alignSelf: 'stretch',
-  //   paddingRight: 20,
-  // },
-//   buttonsContainerBase: {
-//     flex: 1,
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     justifyContent: 'space-between',
-//   },
-//   buttonsContainerTopRow: {
-//     maxHeight: BUTTON_HEIGHT,
-//     alignSelf: 'stretch',
-//     paddingRight: 20,
-//   },
-//   playStopContainer: {
-//     flex: 1,
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     justifyContent: 'space-between',
-//     minWidth: (BUTTON_HEIGHT + BUTTON_HEIGHT) * 3.0 / 2.0,
-//     maxWidth: (BUTTON_HEIGHT + BUTTON_HEIGHT) * 3.0 / 2.0,
-//   }
-// });
-
 const styles = StyleSheet.create({
+    recipientInput: {
+        height: BUTTON_HEIGHT,
+        borderWidth: 1,
+        borderRadius: 5,
+        fontSize: 20,
+        paddingLeft: 10,
+        marginTop: 30
+    },
+    recordButton: {
+
+    },
     recorderContainer: {
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'flex-start',
         paddingTop: 20,
         paddingHorizontal: 20,
-        // borderBottomWidth: 1,
-        padding: 20
-    },
-    recordingPanel: {
-        // flex: 1,
-        flexDirection: 'row',
-        // marginTop: 50,
-        alignSelf: 'stretch',
-        justifyContent: 'space-between'
+        padding: 20,
+        marginBottom: 50,
+        overflow: 'visible'
     },
     recordingIcon: {
         alignSelf: 'center',
         transform: [{translateY: -50}]
+    },
+    recordingPanel: {
+        flexDirection: 'row',
+        alignSelf: 'stretch',
+        justifyContent: 'space-between'
     },
     recordingStatus: {
         alignSelf: 'center',
@@ -430,17 +383,15 @@ const styles = StyleSheet.create({
     recordingTimestamp: {
         alignSelf: 'center'
     },
+    playerButton: {
+        minHeight: BUTTON_HEIGHT
+    },
     playbackContainer: {
-        // flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between', // was space-between
-        // alignItems: 'center',
+        justifyContent: 'space-between',
         minHeight: BUTTON_HEIGHT,
         maxHeight: BUTTON_HEIGHT,
 
-    },
-    playerButton: {
-        minHeight: BUTTON_HEIGHT
     },
     playbackSlider: {
         minWidth: DEVICE_WIDTH / 1.8,
@@ -451,4 +402,10 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         minHeight: FONT_SIZE,
     },
+    sendButtonContainer: {
+        marginTop: 30
+    },
+    sendPrivateMessageButton: {
+
+    }
 });

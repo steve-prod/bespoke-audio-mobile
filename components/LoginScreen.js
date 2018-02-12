@@ -46,13 +46,13 @@ export default class LoginScreen extends Component {
             <View style={styles.login}>
                 <Text>Please log in</Text>
                 <TextInput
-                    style={styles.loginButton}
+                    style={styles.loginInput}
                     placeholder="Email"
                     type="email"
                     onChangeText={(email) => this.setState({email: email})}
                 />
                 <TextInput
-                    style={styles.loginButton}
+                    style={styles.loginInput}
                     placeholder="Password"
                     secureTextEntry={true}
                     onChangeText={(password) => this.setState({password: password})}
@@ -100,10 +100,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    loginButton: {
+    loginInput: {
         height: 40,
         width:300,
         borderColor: 'gray',
-        borderWidth: 1
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingLeft: 10,
+        fontSize: 20,
+        marginTop: 10
     }
 });

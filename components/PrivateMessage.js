@@ -24,7 +24,6 @@ export default class PrivateMessage extends Component {
         this.isSeeking = false;
         this.shouldPlayAtEndOfSeek = false;
         this.state = {
-            info: "",
             shouldPlay: false,
             shouldCorrectPitch: true,
             playbackInstance: null,
@@ -32,8 +31,9 @@ export default class PrivateMessage extends Component {
             playbackInstancePosition: 0,
             playbackInstanceDuration: 0,
             isPlaying: false,
-            isBuffering: true
+            isBuffering: true,
         };
+        this.getAndSetMessageAudio = this.getAndSetMessageAudio.bind(this);
     }
 
     componentDidMount() {
@@ -48,7 +48,7 @@ export default class PrivateMessage extends Component {
     }
 
     async getAndSetMessageAudio() {
-        const source = { uri: "https://bespoke-audio.com/audio/" + this.props.messageID + ".mp3" };
+        const source = { uri: "https://bespoke-audio.com/audio/" + this.props.messageID + ".caf" };
         const initialStatus = {
           shouldPlay: false,
           shouldCorrectPitch: this.state.shouldCorrectPitch,
@@ -62,13 +62,15 @@ export default class PrivateMessage extends Component {
                 initialStatus,
                 this._onPlaybackStatusUpdate
             );
+            console.log("Status: ", status);
+            console.log(sound);
             this.setState({
                 isBuffering: false,
                 playbackInstance: sound,
-                playbackInstanceDuration: Math.floor(status.playableDurationMillis / 1000)
+                playbackInstanceDuration: status.playableDurationMillis / 1000
             })
         } catch (e) {
-            // this.setState({info: JSON.stringify(e)});
+            console.log(e);
         }
     }
 
@@ -193,7 +195,7 @@ export default class PrivateMessage extends Component {
                       disabled={this.state.isBuffering}
                     />}
                     <Text style={styles.playerTracking}>
-                        {Math.floor(this.state.playbackInstancePosition)} / {this.state.playbackInstanceDuration}
+                        {Math.floor(this.state.playbackInstancePosition)} / {Math.ceil(this.state.playbackInstanceDuration)}
                     </Text>
                 </View>
             </View>
