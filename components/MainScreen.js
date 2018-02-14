@@ -15,7 +15,6 @@ class MainScreen extends Component {
 
 const InboxStack = StackNavigator({
     Inbox: { screen: InboxScreen},
-    Details: { screen: DetailsScreen },
     Login: { screen: LoginScreen}
 });
 
@@ -40,11 +39,11 @@ export default TabNavigator({
             const { routeName } = navigation.state;
             let iconName;
             if (routeName === 'Inbox') {
-                iconName = `ios-filing${focused ? '' : '-outline'}`;
+                iconName = `ios-filing${ focused ? '' : '-outline' }`;
             } else if (routeName === 'Recorder') {
-                iconName = `ios-mic${focused ? '' : '-outline'}`;
+                iconName = `ios-mic${ focused ? '' : '-outline' }`;
             } else if (routeName === 'Browse') {
-                iconName = `ios-list${focused ? '' : '-outline'}`;
+                iconName = `ios-list${ focused ? '' : '-outline' }`;
             }
 
             return <Ionicons name={iconName} size={25} color={tintColor} />;

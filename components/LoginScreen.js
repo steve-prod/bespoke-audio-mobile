@@ -64,8 +64,8 @@ export default class LoginScreen extends Component {
                         var formData = new FormData();
                         formData.append("email", that.state.email);
                         formData.append("password", that.state.password);
-                        var resetsXHR = new XMLHttpRequest();
-                        resetsXHR.addEventListener('load', function(event) {
+                        var loginXHR = new XMLHttpRequest();
+                        loginXHR.addEventListener('load', function(event) {
                             if (event.target.status === 200) {
                                 const session = event.target.getResponseHeader("Set-Cookie").split(";")[0].slice(8);
                                 that.submitCredentials(session);
@@ -74,12 +74,12 @@ export default class LoginScreen extends Component {
                                 alert(event.target.responseText);
                             }
                         });
-                        resetsXHR.addEventListener('error', function(event) {
+                        loginXHR.addEventListener('error', function(event) {
                             // TODO: alert user login failed
                             alert(event.target.status)
                         });
-                        resetsXHR.open('POST', 'https://bespoke-audio.com/login');
-                        resetsXHR.send(formData);
+                        loginXHR.open('POST', 'https://bespoke-audio.com/login');
+                        loginXHR.send(formData);
                     }}
                 />
                 <Button

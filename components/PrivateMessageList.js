@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { Button, FlatList, StyleSheet, Text, View } from 'react-native';
 import PrivateMessage from './PrivateMessage.js';
 
 const BACKGROUND_COLOR = '#FFF8ED';
+const FONT_SIZE = 20;
 
 export default class PrivateMessageList extends Component {
     constructor(props) {
@@ -10,13 +11,14 @@ export default class PrivateMessageList extends Component {
         this.state = {
             messages: []
         };
+        this._updatePrivateMessagesList = this._updatePrivateMessagesList.bind(this);
     }
 
     componentDidMount() {
-        this.getMessages();
+        this._getMessages();
     }
 
-    getMessages() {
+    _getMessages() {
         var that = this;
         var messagesXHR = new XMLHttpRequest();
         messagesXHR.addEventListener('load', (event) => {
@@ -37,22 +39,60 @@ export default class PrivateMessageList extends Component {
         messagesXHR.send();
     }
 
+    _updatePrivateMessagesList() {
+        this._getMessages();
+    }
+
     render() {
         return (
-            <FlatList
-                style={styles.privateMessageList}
-                data={this.state.messages}
-                keyExtractor={ (item, index) => item.messageID}
-                renderItem={({item}) => (
-                    <PrivateMessage messageID={item.messageID} creatorID={item.creatorID} />
-                )}
-            />
+            <View style={styles.privateMessagesListContainer}>
+                <View style={styles.refreshPrivateMessagesButtonContainer}>
+                    <Text style={styles.inboxText}>Inbox</Text>
+                    <Button
+                        title="Refresh"
+                        onPress={this._updatePrivateMessagesList}
+                        style={styles.refreshButton}
+                    />
+                </View>
+                <FlatList
+                    style={styles.privateMessagesList}
+                    data={this.state.messages}
+                    keyExtractor={ (item, index) => item.messageID}
+                    renderItem={({item}) => (
+                        <PrivateMessage
+                            messageID={item.messageID}
+                            creatorID={item.creatorID}
+                            onPrivateMessageListChange={this._updatePrivateMessagesList}
+                        />
+                    )}
+                />
+                <View style={styles.tabMenuBuffer} />
+            </View>
         )
     }
 }
 
 const styles = StyleSheet.create({
-    privateMessageList: {
-        borderTopWidth: 1
+    inboxText: {
+        paddingVertical: 10,
+        marginLeft: 20,
+        alignContent: 'center',
+        fontSize: FONT_SIZE
+    },
+    privateMessagesList: {
+        borderTopWidth: 1,
+    },
+    privateMessagesListContainer: {
+        overflow: 'scroll'
+    },
+    refreshButton: {
+        
+    },
+    refreshPrivateMessagesButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    tabMenuBuffer: {
+        height: 40
     }
 });

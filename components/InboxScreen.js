@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
     AsyncStorage,
     Button,
-    Dimensions,
     StyleSheet,
     Text,
     View } from 'react-native';
@@ -17,14 +16,10 @@ const resetAction = NavigationActions.reset({
 });
 
 const BACKGROUND_COLOR = '#FFF8ED';
-const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get('window');
 
 export default class InboxScreen extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            feedback: ""
-        };
     }
 
     componentDidMount() {
@@ -74,15 +69,7 @@ export default class InboxScreen extends Component {
     render() {
         return (
             <View style={styles.inbox}>
-                <View style={styles.inboxText}>
-                    <Text>Inbox</Text>
-                </View>
                 <PrivateMessageList />
-                <Text>{this.state.feedback}</Text>
-                <Button
-                    title="Go to Message Details"
-                    onPress={() => this.props.navigation.navigate('Details')}
-                />
             </View>
         );
     }
@@ -93,8 +80,4 @@ const styles = StyleSheet.create({
         backgroundColor: BACKGROUND_COLOR,
         flex: 1,
     },
-    inboxText: {
-        paddingVertical: 10,
-        alignSelf: 'center',
-    }
 });

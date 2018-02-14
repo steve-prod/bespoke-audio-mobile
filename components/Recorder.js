@@ -27,7 +27,7 @@ export default class Recorder extends Component {
     this.isSeeking = false;
     this.shouldPlayAtEndOfSeek = false;
     this.state = {
-      haveRecordingPermissions: false,
+      hasRecordingPermissions: false,
       isLoading: false,
       isPlaybackAllowed: false,
       soundPosition: null,
@@ -52,7 +52,7 @@ export default class Recorder extends Component {
   _askForPermissions = async () => {
     const response = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
     this.setState({
-      haveRecordingPermissions: response.status === 'granted',
+      hasRecordingPermissions: response.status === 'granted',
     });
   };
 
@@ -164,6 +164,7 @@ export default class Recorder extends Component {
     if (this.state.isRecording) {
       this._stopRecordingAndEnablePlayback();
     } else {
+      this.setState({isSent: false})
       this._stopPlaybackAndBeginRecording();
     }
   };
@@ -251,27 +252,32 @@ export default class Recorder extends Component {
       formData.append("recipient", that.state.recipientEmail);
       formData.append("isPublic", false);
       console.log(formData);
-      var resetsXHR = new XMLHttpRequest();
-      resetsXHR.addEventListener('load', function(event) {
+      var sendMessageXHR = new XMLHttpRequest();
+      sendMessageXHR.addEventListener('load', (event) => {
           if (event.target.status === 201) {
-              // TODO: alert user upload was successful
+              this.setState({
+                  isSending: false,
+                  isSent: true
+              });
           } else {
-              // TODO: alert user login failed
-              alert(event.target.responseText);
-              alert("200 error: messageFromServer");
+              this.setState({isSending: false});
+              // TODO: indicate message send failure
+
           }
       });
-      resetsXHR.addEventListener('error', function(event) {
+      sendMessageXHR.addEventListener('error', function(event) {
+          this.setState({isSending: false});
           // TODO: alert user login failed
           alert(event.target.status)
           alert("XHR Error: eventMessage")
       });
-      resetsXHR.open('POST', 'https://bespoke-audio.com/messages');
-      resetsXHR.send(formData);
+      sendMessageXHR.open('POST', 'https://bespoke-audio.com/messages');
+      sendMessageXHR.send(formData);
+      this.setState({isSending: true});
   }
 
   render() {
-    return !this.state.haveRecordingPermissions ? (
+    return !this.state.hasRecordingPermissions ? (
       <View style={styles.recorderContainer}>
         <Text style={[styles.noPermissionsText]}>
           You must enable audio recording permissions in order to use this app.
@@ -332,13 +338,17 @@ export default class Recorder extends Component {
             />
         </View>
         <View style={styles.sendButtonContainer}>
+            {this.state.recipientEmail.indexOf('@') != -1 &&
+             !this.state.isSending && !this.state.isSent &&
             <Button
                 title={"Send Message"}
                 size={BUTTON_HEIGHT}
                 onPress={this._sendPrivateMessage}
                 disabled={this.state.isLoading}
                 style={styles.sendPrivateMessageButton}
-            />
+            />}
+            <Text style={this.state.isSending ? styles.sendingBanner : styles.removed}>Sending...</Text>
+            <Text style={this.state.isSent ? styles.sentBanner : styles.removed}>Message Sent</Text>
         </View>
       </View>
     );
@@ -383,6 +393,9 @@ const styles = StyleSheet.create({
     recordingTimestamp: {
         alignSelf: 'center'
     },
+    removed: {
+        display: 'none'
+    },
     playerButton: {
         minHeight: BUTTON_HEIGHT
     },
@@ -406,6 +419,15 @@ const styles = StyleSheet.create({
         marginTop: 30
     },
     sendPrivateMessageButton: {
+
+    },
+    sendingBanner: {
+        color: 'yellow',
+        alignSelf: 'center'
+    },
+    sentBanner: {
+        color: 'green',
+        alignSelf: 'center'
 
     }
 });

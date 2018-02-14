@@ -34,6 +34,8 @@ export default class PrivateMessage extends Component {
       isPlaying: false,
       isBuffering: true,
     };
+    this._deleteMessage = this._deleteMessage.bind(this);
+    this._updatePrivateMessageList = this._updatePrivateMessageList.bind(this);
   }
 
   componentDidMount() {
@@ -154,6 +156,28 @@ export default class PrivateMessage extends Component {
     return '00:00 / ' + this._getMMSSFromMillis(this.state.playbackInstanceDuration);
   }
 
+  _deleteMessage() {
+      var deleteXHR = new XMLHttpRequest();
+      deleteXHR.addEventListener('load', (event) => {
+          if (event.target.status === 204) {
+              this._updatePrivateMessageList();
+          } else {
+              // TODO: alert user login failed
+              alert(event.target.responseText);
+          }
+      });
+      deleteXHR.addEventListener('error', function(event) {
+          // TODO: alert user login failed
+          alert(event.target.status)
+      });
+      deleteXHR.open('DELETE', 'https://bespoke-audio.com/messages/' + this.props.messageID);
+      deleteXHR.send();
+  }
+
+  _updatePrivateMessageList() {
+      this.props.onPrivateMessageListChange();
+  }
+
     render() {
         return (
             <View style={styles.messageContainer}>
@@ -191,6 +215,12 @@ export default class PrivateMessage extends Component {
                     <Text style={styles.playerTracking}>
                         {this._getTimestamp()}
                     </Text>
+                </View>
+                <View style={styles.privateMessageButtonContainer}>
+                    <Button
+                        title="Delete"
+                        onPress={this._deleteMessage}
+                    />
                 </View>
             </View>
         );
