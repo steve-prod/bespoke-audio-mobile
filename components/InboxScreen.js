@@ -3,7 +3,6 @@ import {
     AsyncStorage,
     Button,
     StyleSheet,
-    Text,
     View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { Audio } from 'expo';
@@ -20,6 +19,7 @@ const BACKGROUND_COLOR = '#FFF8ED';
 export default class InboxScreen extends Component {
     constructor(props) {
         super(props);
+        this._reply = this._reply.bind(this);
     }
 
     componentDidMount() {
@@ -66,17 +66,22 @@ export default class InboxScreen extends Component {
         };
     };
 
+    _reply(creatorID) {
+        this.props.navigation.navigate('Recorder', {creatorID: creatorID})
+    }
+
     render() {
         return (
-            <View style={styles.inbox}>
-                <PrivateMessageList />
+            <View style={styles.inboxScreen}>
+                <PrivateMessageList onReplyPressed={(creatorID) => this._reply(creatorID)}/>
             </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    inbox: {
+    inboxScreen: {
+        top: 30,
         backgroundColor: BACKGROUND_COLOR,
         flex: 1,
     },

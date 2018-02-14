@@ -12,6 +12,7 @@ export default class PrivateMessageList extends Component {
             messages: []
         };
         this._updatePrivateMessagesList = this._updatePrivateMessagesList.bind(this);
+        this._reply = this._reply.bind(this);
     }
 
     componentDidMount() {
@@ -43,6 +44,10 @@ export default class PrivateMessageList extends Component {
         this._getMessages();
     }
 
+    _reply(creatorID) {
+        this.props.onReplyPressed(creatorID);
+    }
+
     render() {
         return (
             <View style={styles.privateMessagesListContainer}>
@@ -54,6 +59,7 @@ export default class PrivateMessageList extends Component {
                         style={styles.refreshButton}
                     />
                 </View>
+                {this.state.messages.length > 0 &&
                 <FlatList
                     style={styles.privateMessagesList}
                     data={this.state.messages}
@@ -62,10 +68,13 @@ export default class PrivateMessageList extends Component {
                         <PrivateMessage
                             messageID={item.messageID}
                             creatorID={item.creatorID}
+                            onReplyPressed={(creatorID) => this._reply(creatorID)}
                             onPrivateMessageListChange={this._updatePrivateMessagesList}
                         />
                     )}
-                />
+                />}
+                {this.state.messages.length === 0 &&
+                    <Text style={styles.noMessages} >No messages</Text>}
                 <View style={styles.tabMenuBuffer} />
             </View>
         )
@@ -79,6 +88,10 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         fontSize: FONT_SIZE
     },
+    noMessages: {
+        alignSelf: 'center',
+        fontSize: 20,
+    },
     privateMessagesList: {
         borderTopWidth: 1,
     },
@@ -86,7 +99,7 @@ const styles = StyleSheet.create({
         overflow: 'scroll'
     },
     refreshButton: {
-        
+
     },
     refreshPrivateMessagesButtonContainer: {
         flexDirection: 'row',

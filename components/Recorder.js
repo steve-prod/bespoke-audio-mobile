@@ -38,9 +38,11 @@ export default class Recorder extends Component {
       isRecording: false,
       shouldCorrectPitch: true,
       recipientEmail: "",
+      isReplying: false
     };
     this.recordingSettings = JSON.parse(JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY));
     this._sendPrivateMessage = this._sendPrivateMessage.bind(this);
+    this._reloadRecorder = this._reloadRecorder.bind(this);
     // // UNCOMMENT THIS TO TEST maxFileSize:
     // this.recordingSettings.android['maxFileSize'] = 12000;
   }
@@ -71,6 +73,7 @@ export default class Recorder extends Component {
         soundDuration: null,
         soundPosition: null,
         isPlaybackAllowed: false,
+        recipientEmail: this.props.creatorID
       });
       if (status.error) {
         console.log(`FATAL PLAYER ERROR: ${status.error}`);
@@ -245,6 +248,10 @@ export default class Recorder extends Component {
     return `${this._getMMSSFromMillis(0)}`;
   }
 
+  _reloadRecorder() {
+      this.props.reloadRecorder();
+  }
+
   _sendPrivateMessage() {
       var that = this;
       var formData = new FormData();
@@ -259,6 +266,16 @@ export default class Recorder extends Component {
                   isSending: false,
                   isSent: true
               });
+              setTimeout(() => {
+                  this.setState({
+                      isSent: false,
+                      recipientEmail: "",
+                      isPlaybackAllowed: false
+                  });
+              }, 2000)
+              this.recording = null;
+              this.sound = null;
+              this._reloadRecorder();
           } else {
               this.setState({isSending: false});
               // TODO: indicate message send failure
@@ -277,6 +294,7 @@ export default class Recorder extends Component {
   }
 
   render() {
+    const creatorID = this.props.creatorID || "";
     return !this.state.hasRecordingPermissions ? (
       <View style={styles.recorderContainer}>
         <Text style={[styles.noPermissionsText]}>
@@ -331,14 +349,26 @@ export default class Recorder extends Component {
           </View>
         </View>
         <View>
-            <TextInput
+            {!this.props.isReplying && <TextInput
+                id="recipient-email"
                 style={styles.recipientInput}
                 placeholder="Recipient email here"
-                onChangeText={(text) => this.setState({recipientEmail: text})}
-            />
+                value={this.state.recipientEmail}
+                onChangeText={(text) => {
+                    this.setState({recipientEmail: text})
+                }}
+            />}
+            {this.props.isReplying &&
+                <View>
+                    <View style={styles.replyButtons}>
+                        <Text style={styles.replyingTo}>Replying To:</Text>
+                        <Button title="Reset" onPress={this._reloadRecorder} />
+                    </View>
+                    <Text style={styles.replyingToCreatorID}>{creatorID}</Text>
+                </View>}
         </View>
         <View style={styles.sendButtonContainer}>
-            {this.state.recipientEmail.indexOf('@') != -1 &&
+            {this.state.recipientEmail.indexOf('@') !== -1 &&
              !this.state.isSending && !this.state.isSent &&
             <Button
                 title={"Send Message"}
@@ -356,13 +386,22 @@ export default class Recorder extends Component {
 }
 
 const styles = StyleSheet.create({
+    playbackSlider: {
+        minWidth: DEVICE_WIDTH / 1.8,
+        maxWidth: DEVICE_WIDTH / 1.8,
+    },
+    playbackTimestamp: {
+        textAlign: 'right',
+        alignSelf: 'center',
+        minHeight: FONT_SIZE,
+    },
     recipientInput: {
         height: BUTTON_HEIGHT,
         borderWidth: 1,
         borderRadius: 5,
         fontSize: 20,
         paddingLeft: 10,
-        marginTop: 30
+        marginTop: 38
     },
     recordButton: {
 
@@ -396,6 +435,22 @@ const styles = StyleSheet.create({
     removed: {
         display: 'none'
     },
+    replyButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    replyingTo: {
+        marginTop: 10,
+        fontSize: 20
+    },
+    replyingToCreatorID: {
+        height: BUTTON_HEIGHT,
+        borderWidth: 1,
+        borderRadius: 5,
+        fontSize: 20,
+        paddingTop: 10,
+        paddingLeft: 10,
+    },
     playerButton: {
         minHeight: BUTTON_HEIGHT
     },
@@ -405,15 +460,6 @@ const styles = StyleSheet.create({
         minHeight: BUTTON_HEIGHT,
         maxHeight: BUTTON_HEIGHT,
 
-    },
-    playbackSlider: {
-        minWidth: DEVICE_WIDTH / 1.8,
-        maxWidth: DEVICE_WIDTH / 1.8,
-    },
-    playbackTimestamp: {
-        textAlign: 'right',
-        alignSelf: 'center',
-        minHeight: FONT_SIZE,
     },
     sendButtonContainer: {
         marginTop: 30

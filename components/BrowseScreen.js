@@ -35,22 +35,19 @@ export default class BrowseScreen extends Component {
 
     render() {
         return (
-            <View style={styles.browse}>
+            <View style={styles.browseScreen}>
                 <View style={styles.browseText}>
                     <Text>Browse</Text>
                 </View>
                 <PublicMessageList />
-                <Button
-                    title="Go to Message Details"
-                    onPress={() => this.props.navigation.navigate('Details')}
-                />
             </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    browse: {
+    browseScreen: {
+        top: 30,
         backgroundColor: BACKGROUND_COLOR,
         flex: 1,
     },

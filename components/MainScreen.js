@@ -13,26 +13,10 @@ class MainScreen extends Component {
     };
 }
 
-const InboxStack = StackNavigator({
-    Inbox: { screen: InboxScreen},
-    Login: { screen: LoginScreen}
-});
-
-const RecorderStack = StackNavigator({
-    Recorder: { screen: RecorderScreen },
-    Login: { screen: LoginScreen}
-});
-
-const BrowseStack = StackNavigator({
-    Browse: { screen: BrowseScreen },
-    Details: { screen: DetailsScreen },
-    Login: { screen: LoginScreen}
-});
-
 export default TabNavigator({
-    Inbox: { screen: InboxStack },
-    Recorder: { screen: RecorderStack },
-    Browse: { screen: BrowseStack }
+    Inbox: { screen: InboxScreen },
+    Recorder: { screen: RecorderScreen },
+    Browse: { screen: BrowseScreen }
 }, {
     navigationOptions: ({ navigation }) => ({
         tabBarIcon: ({ focused, tintColor }) => {

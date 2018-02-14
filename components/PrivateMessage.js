@@ -36,6 +36,7 @@ export default class PrivateMessage extends Component {
     };
     this._deleteMessage = this._deleteMessage.bind(this);
     this._updatePrivateMessageList = this._updatePrivateMessageList.bind(this);
+    this._reply = this._reply.bind(this);
   }
 
   componentDidMount() {
@@ -178,6 +179,10 @@ export default class PrivateMessage extends Component {
       this.props.onPrivateMessageListChange();
   }
 
+  _reply(creatorID) {
+      this.props.onReplyPressed(creatorID);
+  }
+
     render() {
         return (
             <View style={styles.messageContainer}>
@@ -218,8 +223,14 @@ export default class PrivateMessage extends Component {
                 </View>
                 <View style={styles.privateMessageButtonContainer}>
                     <Button
+                        title="Reply"
+                        onPress={() => this._reply(this.props.creatorID)}
+                    />
+                    <Button
                         title="Delete"
                         onPress={this._deleteMessage}
+                        style={styles.deleteButton}
+                        color='red'
                     />
                 </View>
             </View>
@@ -228,14 +239,14 @@ export default class PrivateMessage extends Component {
 }
 
 const styles = StyleSheet.create({
+    fromContainer: {
+        // marginLeft: 10
+    },
     messageContainer: {
       paddingTop: 20,
       paddingHorizontal: 20,
       borderBottomWidth: 1,
       padding: 20
-    },
-    fromContainer: {
-        // marginLeft: 10
     },
     playerContainer: {
       flex: 1,
@@ -255,5 +266,9 @@ const styles = StyleSheet.create({
     },
     playerTracking: {
       minHeight: FONT_SIZE,
+    },
+    privateMessageButtonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-around'
     }
 });
