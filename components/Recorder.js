@@ -38,7 +38,8 @@ export default class Recorder extends Component {
       isRecording: false,
       shouldCorrectPitch: true,
       recipientEmail: "",
-      isReplying: false
+      isReplying: false,
+      isPublic: false
     };
     this.recordingSettings = JSON.parse(JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY));
     this._sendPrivateMessage = this._sendPrivateMessage.bind(this);
@@ -258,7 +259,6 @@ export default class Recorder extends Component {
       formData.append("blob", {uri:that.recording.getURI(), name:"blob", type:"audio/x-caf"});
       formData.append("recipient", that.state.recipientEmail);
       formData.append("isPublic", false);
-      console.log(formData);
       var sendMessageXHR = new XMLHttpRequest();
       sendMessageXHR.addEventListener('load', (event) => {
           if (event.target.status === 201) {

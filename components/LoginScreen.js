@@ -1,5 +1,16 @@
 import React, { Component } from 'react';
 import { AsyncStorage, Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { NavigationActions } from 'react-navigation';
+
+const loginAction = NavigationActions.reset({
+    index: 0,
+    actions: [NavigationActions.navigate({ routeName: 'Main'})]
+});
+
+const signupAction = NavigationActions.reset({
+    index: 0,
+    actions: [NavigationActions.navigate({ routeName: 'Signup'})]
+});
 
 export default class LoginScreen extends Component {
     constructor(props) {
@@ -8,37 +19,32 @@ export default class LoginScreen extends Component {
             email: '',
             password: ''
         };
+        this.navigation = null;
     }
 
     componentDidMount() {
         var that = this;
-        load = async () => {
-            try {
-                const session = await AsyncStorage.getItem('session')
-                if (session != null) {
-                    that.props.navigation.navigate('Main', {
-                        response: session
-                    });
-                }
-            } catch (e) {
-                // TODO: alert the user
+        var statusXHR = new XMLHttpRequest();
+        statusXHR.addEventListener('load', function(event) {
+            if (event.target.status === 200) {
+                that.props.navigation.navigate("Main");
+            } else {
+                // do nothing
             }
-        }
-        load();
+        });
+        statusXHR.addEventListener('error', function(event) {
+            // do nothing
+        });
+        statusXHR.open('GET', 'https://bespoke-audio.com/status');
+        statusXHR.send();
     }
 
-    submitCredentials = async (session) => {
-        try {
-            await AsyncStorage.setItem('session', session);
-            this.props.navigation.navigate('Main');
-        } catch (e) {
-            alert(JSON.stringify(e));
-        }
-    }
-
-    static navigationOptions = {
-        header: null,
-        tabBarVisible: false
+    static navigationOptions = ({navigation, navigationOptions}) => {
+        this.navigation = navigation;
+        return {
+            header: null,
+            tabBarVisible: false
+        };
     };
 
     render() {
@@ -57,44 +63,51 @@ export default class LoginScreen extends Component {
                     secureTextEntry={true}
                     onChangeText={(password) => this.setState({password: password})}
                 />
-                <Button
-                    title="Login"
-                    onPress={() => {
-                        var that = this;
-                        var formData = new FormData();
-                        formData.append("email", that.state.email);
-                        formData.append("password", that.state.password);
-                        var loginXHR = new XMLHttpRequest();
-                        loginXHR.addEventListener('load', function(event) {
-                            if (event.target.status === 200) {
-                                const session = event.target.getResponseHeader("Set-Cookie").split(";")[0].slice(8);
-                                that.submitCredentials(session);
-                            } else {
+                <View style={styles.buttonsContainer}>
+                    <Button
+                        title="Login"
+                        onPress={() => {
+                            var that = this;
+                            var formData = new FormData();
+                            formData.append("email", that.state.email);
+                            formData.append("password", that.state.password);
+                            var loginXHR = new XMLHttpRequest();
+                            loginXHR.addEventListener('load', function(event) {
+                                if (event.target.status === 200) {
+                                    navigation.dispatch(loginAction);
+                                } else {
+                                    // TODO: alert user login failed
+                                    alert(event.target.responseText);
+                                }
+                            });
+                            loginXHR.addEventListener('error', function(event) {
                                 // TODO: alert user login failed
-                                alert(event.target.responseText);
-                            }
-                        });
-                        loginXHR.addEventListener('error', function(event) {
-                            // TODO: alert user login failed
-                            alert(event.target.status)
-                        });
-                        loginXHR.open('POST', 'https://bespoke-audio.com/login');
-                        loginXHR.send(formData);
-                    }}
-                />
-                <Button
-                    title="Signup"
-                    onPress={() => {
-                        // TODO: navigate to signup
-
-                    }}
-                />
+                                alert(event.target.status)
+                            });
+                            loginXHR.open('POST', 'https://bespoke-audio.com/login');
+                            loginXHR.send(formData);
+                        }}
+                    />
+                    <Button
+                        title="Signup"
+                        onPress={() => {
+                            // TODO: navigate to signup
+                            navigation.dispatch(signupAction);
+                        }}
+                    />
+                </View>
             </View>
         );
     };
 }
 
 const styles = StyleSheet.create({
+    buttonsContainer: {
+        marginTop: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%'
+    },
     login: {
         flex: 1,
         alignItems: 'center',

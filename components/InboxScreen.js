@@ -8,6 +8,7 @@ import { NavigationActions } from 'react-navigation';
 import { Audio } from 'expo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import PrivateMessageList from './PrivateMessageList.js';
+import RCTNetworking from 'RCTNetworking';
 
 const resetAction = NavigationActions.reset({
     index: 0,
@@ -26,43 +27,42 @@ export default class InboxScreen extends Component {
         this.doesValidSessionExist();
     }
 
-    doesValidSessionExist = async () => {
-        try {
-            const session = await AsyncStorage.getItem('session')
-            if (session === null) {
-                this.props.navigation.navigate('Login')
+    doesValidSessionExist = () => {
+        var statusXHR = new XMLHttpRequest();
+        statusXHR.addEventListener('load', function(event) {
+            if (event.target.status === 200) {
+                // user is logged in, do nothing
+            } else {
+                // user is NOT logged in, navigate to login screen
+                RCTNetworking.clearCookies((cookiesEaten) => {navigation.dispatch(resetAction)})
             }
-        } catch (e) {
-            try {
-                async (session) => {
-                    await AsyncStorage.setItem('session', "")
-                    this.props.navigation.navigate('Login')
-                }
-            } catch (e) {
-                // TODO: alert user
-            }
-        }
+        });
+        statusXHR.addEventListener('error', function(event) {
+            navigation.dispatch(resetAction);
+        });
+        statusXHR.open('GET', 'https://bespoke-audio.com/status');
+        statusXHR.send();
     }
 
     static navigationOptions = ({navigation, navigationOptions}) => {
         return {
+            headerLeft: null,
             headerRight: (
                 <Button
-                    onPress={async () => {
-                            try {
-                                await AsyncStorage.setItem('session', "");
-                                navigation.dispatch(resetAction);
-                            } catch (e) {
-                                // TODO: alert user
-                                alert(JSON.stringify(e));
-                            }
+                    onPress={() => {
+                        try {
+                            RCTNetworking.clearCookies(() => {navigation.dispatch(resetAction)})
+                        } catch (e) {
+                            // TODO: alert user
+                            console.log(e)
                         }
-                    }
+                    }}
                     type="button"
                     title="Logout"
                     color="#000"
                 />
-            )
+            ),
+            headerTitle: "Bespoke-Audio"
         };
     };
 
@@ -81,7 +81,7 @@ export default class InboxScreen extends Component {
 
 const styles = StyleSheet.create({
     inboxScreen: {
-        top: 30,
+        // top: 30,
         backgroundColor: BACKGROUND_COLOR,
         flex: 1,
     },

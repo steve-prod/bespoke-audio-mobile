@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { TabNavigator, TabBarBottom, StackNavigator } from 'react-navigation';
+import { StackNavigator, TabNavigator, TabBarBottom } from 'react-navigation';
 import DetailsScreen from './DetailsScreen.js';
 import InboxScreen from './InboxScreen.js';
 import RecorderScreen from './RecorderScreen.js';
@@ -31,12 +31,11 @@ export default TabNavigator({
             }
 
             return <Ionicons name={iconName} size={25} color={tintColor} />;
-        },
-        header: null
+        }
     }),
     tabBarOptions: {
         activeTintColor: 'tomato',
-        inactiveTintColor: 'gray'
+        inactiveTintColor: 'gray',
     },
     tabBarComponent: TabBarBottom,
     tabBarPosition: 'bottom',

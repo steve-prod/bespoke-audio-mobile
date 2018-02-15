@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { AsyncStorage, Button, Dimensions, StyleSheet, Text, View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import Recorder from './Recorder.js';
+import RCTNetworking from 'RCTNetworking';
 
 const resetAction = NavigationActions.reset({
     index: 0,
@@ -20,15 +21,15 @@ export default class RecorderScreen extends Component {
 
     static navigationOptions = ({navigation, navigationOptions}) => {
         return {
+            headerLeft: null,
             headerRight: (
                 <Button
-                    onPress={async () => {
+                    onPress={() => {
                             try {
-                                await AsyncStorage.setItem('session', "");
-                                navigation.dispatch(resetAction);
+                                RCTNetworking.clearCookies(() => {navigation.dispatch(resetAction)})
                             } catch (e) {
                                 // TODO: alert user
-                                alert(JSON.stringify(e));
+                                console.log(e);
                             }
                         }
                     }
@@ -36,7 +37,8 @@ export default class RecorderScreen extends Component {
                     title="Logout"
                     color="#000"
                 />
-            )
+            ),
+            headerTitle: "Bespoke-Audio"
         };
     };
 
@@ -46,20 +48,13 @@ export default class RecorderScreen extends Component {
 
     render() {
         const { params } = this.props.navigation.state;
-        const creatorID = params.creatorID || "";
+        const creatorID = params ? params.creatorID || "" : "";
         const isReplying = creatorID === "" ? false : true;
 
         return (
             <View style={styles.recorderScreen}>
                 <View style={styles.recorderText}>
                     <Text>Recorder</Text>
-                    <Button
-                        title="Logout"
-                        onPress={ async () => {
-                            await AsyncStorage.setItem('session', "");
-                            this.props.navigation.navigate('Login');
-                        }}
-                    />
                 </View>
                 <Recorder creatorID={creatorID} isReplying={isReplying} reloadRecorder={this._reloadRecorder}/>
             </View>
@@ -69,7 +64,7 @@ export default class RecorderScreen extends Component {
 
 const styles = StyleSheet.create({
     recorderScreen: {
-        top: 30,
+        // top: 30,
         flex: 1,
         backgroundColor: BACKGROUND_COLOR,
     },

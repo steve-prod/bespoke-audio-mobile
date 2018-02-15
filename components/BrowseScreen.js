@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import PublicMessageList from './PublicMessageList.js';
+import RCTNetworking from 'RCTNetworking';
+
 
 const resetAction = NavigationActions.reset({
     index: 0,
@@ -13,15 +15,15 @@ const BACKGROUND_COLOR = '#FFF8ED';
 export default class BrowseScreen extends Component {
     static navigationOptions = ({navigation, navigationOptions}) => {
         return {
+            headerLeft: null,
             headerRight: (
                 <Button
-                    onPress={async () => {
+                    onPress={() => {
                             try {
-                                await AsyncStorage.setItem('session', "");
-                                navigation.dispatch(resetAction);
+                                RCTNetworking.clearCookies(() => {navigation.dispatch(resetAction);})
                             } catch (e) {
                                 // TODO: alert user
-                                alert(JSON.stringify(e));
+                                console.log(e);
                             }
                         }
                     }
@@ -29,7 +31,8 @@ export default class BrowseScreen extends Component {
                     title="Logout"
                     color="#000"
                 />
-            )
+            ),
+            headerTitle: "Bespoke-Audio"
         };
     };
 
@@ -47,7 +50,7 @@ export default class BrowseScreen extends Component {
 
 const styles = StyleSheet.create({
     browseScreen: {
-        top: 30,
+        // top: 30,
         backgroundColor: BACKGROUND_COLOR,
         flex: 1,
     },
