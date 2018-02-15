@@ -1,32 +1,32 @@
-import React, { Component } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
-import { NavigationActions } from 'react-navigation';
-import PublicMessageList from './PublicMessageList.js';
-import RCTNetworking from 'RCTNetworking';
-
+import React, { Component } from "react";
+import { Button, StyleSheet, Text, View } from "react-native";
+import { NavigationActions } from "react-navigation";
+import PublicMessageList from "./PublicMessageList.js";
+import RCTNetworking from "RCTNetworking";
 
 const resetAction = NavigationActions.reset({
     index: 0,
-    actions: [NavigationActions.navigate({ routeName: 'Login'})]
+    actions: [NavigationActions.navigate({ routeName: "Login" })]
 });
 
-const BACKGROUND_COLOR = '#FFF8ED';
+const BACKGROUND_COLOR = "#FFF8ED";
 
 export default class BrowseScreen extends Component {
-    static navigationOptions = ({navigation, navigationOptions}) => {
+    static navigationOptions = ({ navigation, navigationOptions }) => {
         return {
             headerLeft: null,
             headerRight: (
                 <Button
                     onPress={() => {
-                            try {
-                                RCTNetworking.clearCookies(() => {navigation.dispatch(resetAction);})
-                            } catch (e) {
-                                // TODO: alert user
-                                console.log(e);
-                            }
+                        try {
+                            RCTNetworking.clearCookies(() => {
+                                navigation.dispatch(resetAction);
+                            });
+                        } catch (e) {
+                            // TODO: alert user
+                            console.log(e);
                         }
-                    }
+                    }}
                     type="button"
                     title="Logout"
                     color="#000"
@@ -50,12 +50,11 @@ export default class BrowseScreen extends Component {
 
 const styles = StyleSheet.create({
     browseScreen: {
-        // top: 30,
         backgroundColor: BACKGROUND_COLOR,
-        flex: 1,
+        flex: 1
     },
     browseText: {
         paddingVertical: 10,
-        alignSelf: 'center',
+        alignSelf: "center"
     }
 });

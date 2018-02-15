@@ -1,21 +1,17 @@
-import React, { Component } from 'react';
-import {
-    AsyncStorage,
-    Button,
-    StyleSheet,
-    View } from 'react-native';
-import { NavigationActions } from 'react-navigation';
-import { Audio } from 'expo';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import PrivateMessageList from './PrivateMessageList.js';
-import RCTNetworking from 'RCTNetworking';
+import React, { Component } from "react";
+import { AsyncStorage, Button, StyleSheet, View } from "react-native";
+import { NavigationActions } from "react-navigation";
+import { Audio } from "expo";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import PrivateMessageList from "./PrivateMessageList.js";
+import RCTNetworking from "RCTNetworking";
 
 const resetAction = NavigationActions.reset({
     index: 0,
-    actions: [NavigationActions.navigate({ routeName: 'Login'})]
+    actions: [NavigationActions.navigate({ routeName: "Login" })]
 });
 
-const BACKGROUND_COLOR = '#FFF8ED';
+const BACKGROUND_COLOR = "#FFF8ED";
 
 export default class InboxScreen extends Component {
     constructor(props) {
@@ -29,32 +25,36 @@ export default class InboxScreen extends Component {
 
     doesValidSessionExist = () => {
         var statusXHR = new XMLHttpRequest();
-        statusXHR.addEventListener('load', function(event) {
+        statusXHR.addEventListener("load", function(event) {
             if (event.target.status === 200) {
                 // user is logged in, do nothing
             } else {
                 // user is NOT logged in, navigate to login screen
-                RCTNetworking.clearCookies((cookiesEaten) => {navigation.dispatch(resetAction)})
+                RCTNetworking.clearCookies(cookiesEaten => {
+                    navigation.dispatch(resetAction);
+                });
             }
         });
-        statusXHR.addEventListener('error', function(event) {
+        statusXHR.addEventListener("error", function(event) {
             navigation.dispatch(resetAction);
         });
-        statusXHR.open('GET', 'https://bespoke-audio.com/status');
+        statusXHR.open("GET", "https://bespoke-audio.com/status");
         statusXHR.send();
-    }
+    };
 
-    static navigationOptions = ({navigation, navigationOptions}) => {
+    static navigationOptions = ({ navigation, navigationOptions }) => {
         return {
             headerLeft: null,
             headerRight: (
                 <Button
                     onPress={() => {
                         try {
-                            RCTNetworking.clearCookies(() => {navigation.dispatch(resetAction)})
+                            RCTNetworking.clearCookies(() => {
+                                navigation.dispatch(resetAction);
+                            });
                         } catch (e) {
                             // TODO: alert user
-                            console.log(e)
+                            console.log(e);
                         }
                     }}
                     type="button"
@@ -67,13 +67,15 @@ export default class InboxScreen extends Component {
     };
 
     _reply(creatorID) {
-        this.props.navigation.navigate('Recorder', {creatorID: creatorID})
+        this.props.navigation.navigate("Recorder", { creatorID: creatorID });
     }
 
     render() {
         return (
             <View style={styles.inboxScreen}>
-                <PrivateMessageList onReplyPressed={(creatorID) => this._reply(creatorID)}/>
+                <PrivateMessageList
+                    onReplyPressed={creatorID => this._reply(creatorID)}
+                />
             </View>
         );
     }
@@ -81,8 +83,7 @@ export default class InboxScreen extends Component {
 
 const styles = StyleSheet.create({
     inboxScreen: {
-        // top: 30,
         backgroundColor: BACKGROUND_COLOR,
-        flex: 1,
-    },
+        flex: 1
+    }
 });
