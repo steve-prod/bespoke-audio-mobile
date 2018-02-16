@@ -50,13 +50,16 @@ export default class RecorderScreen extends Component {
     };
 
     _reloadRecorder() {
-        this.props.navigation.navigate("Recorder", { creatorID: "" });
+        this.props.navigation.navigate("Recorder", {creatorID: "", messageID: "", isPublic: false});
+        this.setState({});
     }
 
     render() {
+        var that = this;
         const { params } = this.props.navigation.state;
         const creatorID = params ? params.creatorID || "" : "";
-        const isReplying = creatorID === "" ? false : true;
+        const messageID = params ? params.messageID || "" : "";
+        const isPublic = params ? params.isPublic === true : false;
 
         return (
             <View style={styles.recorderScreen}>
@@ -65,7 +68,8 @@ export default class RecorderScreen extends Component {
                 </View>
                 <Recorder
                     creatorID={creatorID}
-                    isReplying={isReplying}
+                    messageID={messageID}
+                    isPublic={isPublic}
                     reloadRecorder={this._reloadRecorder}
                 />
             </View>

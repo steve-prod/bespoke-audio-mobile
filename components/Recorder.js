@@ -96,6 +96,9 @@ export default class Recorder extends Component {
                 shouldCorrectPitch: status.shouldCorrectPitch,
                 isPlaybackAllowed: true
             });
+            if(status.didJustFinish) {
+                this.sound.stopAsync();
+            }
         } else {
             this.setState({
                 soundDuration: null,
@@ -283,7 +286,7 @@ export default class Recorder extends Component {
     }
 
     render() {
-        const creatorID = this.props.creatorID || "";
+        var that = this;
         return !this.state.hasRecordingPermissions ? (
             <View style={styles.recorderContainer}>
                 <Text style={[styles.noPermissionsText]}>
@@ -376,13 +379,41 @@ export default class Recorder extends Component {
                         </Text>
                     </View>
                 </View>
-                <StatusNavigator screenProps={
-                    {creatorID: this.props.creatorID,
-                    isReplying: this.props.isReplying,
-                    reloadRecorder: this._reloadRecorder,
-                    recording: this.recording}
+                {this.props.creatorID !== "" &&
+                    // <StatusNavigator screenProps={
+                    //     {creatorID: this.props.creatorID,
+                    //     messageID: "",
+                    //     recording: this.recording,
+                    //     reloadRecorder: this._reloadRecorder}} />
+                    <PrivateScreen
+                        creatorID={this.props.creatorID}
+                        reloadRecorder={this._reloadRecorder}
+                        recording={this.recording}
+                    />
+                    }
+                {this.props.messageID !== "" && !this.props.isPublic &&
+                    <StatusNavigator screenProps={
+                        {creatorID: "",
+                        messageID: this.props.messageID,
+                        recording: this.recording,
+                        reloadRecorder: this._reloadRecorder}
+                    } />
                 }
-                 />
+                {this.props.messageID !== "" && this.props.isPublic &&
+                    <PublicScreen
+                        messageID={this.props.messageID}
+                        reloadRecorder={this._reloadRecorder}
+                        recording={this.recording}
+                    />
+                }
+                {this.props.creatorID === "" && this.props.messageID === "" &&
+                    <StatusNavigator screenProps={
+                        {creatorID: "",
+                        messageID: "",
+                        recording: this.recording,
+                        reloadRecorder: this._reloadRecorder}
+                    } />
+                }
             </View>
         );
     }

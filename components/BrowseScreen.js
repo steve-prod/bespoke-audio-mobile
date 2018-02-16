@@ -36,13 +36,21 @@ export default class BrowseScreen extends Component {
         };
     };
 
+    _replyPrivately(messageID) {
+        this.props.navigation.navigate("Recorder", { creatorID: "", messageID: messageID, isPublic: false });
+    }
+
+    _replyPublicly(messageID) {
+        this.props.navigation.navigate("Recorder", { creatorID: "", messageID: messageID, isPublic: true });
+    }
+
     render() {
         return (
             <View style={styles.browseScreen}>
-                <View style={styles.browseText}>
-                    <Text>Browse</Text>
-                </View>
-                <PublicMessageList />
+                <PublicMessageList
+                    onReplyPrivatelyPressed={(messageID) => this._replyPrivately(messageID)}
+                    onReplyPubliclyPressed={(messageID) => this._replyPublicly(messageID)}
+                />
             </View>
         );
     }

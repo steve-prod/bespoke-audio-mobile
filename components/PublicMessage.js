@@ -169,13 +169,13 @@ export default class PublicMessage extends Component {
         );
     }
 
-    // _updatePublicMessageList() {
-    //     this.props.onPublicMessageListChange();
-    // }
-    //
-    // _reply(creatorID) {
-    //     this.props.onReplyPressed(creatorID);
-    // }
+    _replyPrivately(messageID) {
+        this.props.onReplyPrivatelyPressed(messageID);
+    }
+
+    _replyPublicly(messageID) {
+        this.props.onReplyPubliclyPressed(messageID);
+    }
 
     render() {
         return (
@@ -223,11 +223,11 @@ export default class PublicMessage extends Component {
                 <View style={styles.publicMessageButtonContainer}>
                     <Button
                         title="Reply Privately"
-                        onPress={() => alert("Reply Privately")}
+                        onPress={() => this._replyPrivately(this.props.messageID)}
                     />
                     <Button
                         title="Reply Publicly"
-                        onPress={() => alert("Reply Publicly")}
+                        onPress={() => this._replyPublicly(this.props.messageID)}
                         style={styles.deleteButton}
                         color="red"
                     />

@@ -92,13 +92,7 @@ export default class SignupScreen extends Component {
                                         this.state.password
                                     );
                                     var signupXHR = new XMLHttpRequest();
-                                    signupXHR.addEventListener("load", function(
-                                        event
-                                    ) {
-                                        console.log(
-                                            "Response code: ",
-                                            event.target.status
-                                        );
+                                    signupXHR.addEventListener("load", (event) => {
                                         if (event.target.status === 201) {
                                             that.setState({ isSent: true });
                                         } else {
@@ -106,9 +100,7 @@ export default class SignupScreen extends Component {
                                             console.log(event);
                                         }
                                     });
-                                    signupXHR.addEventListener(
-                                        "error",
-                                        function(event) {
+                                    signupXHR.addEventListener("error", (event) => {
                                             // TODO: alert user sign up failed
                                             console.log(event);
                                         }

@@ -13,12 +13,10 @@ export default class PublicScreen extends Component {
     constructor(props) {
         super(props);
         this.recording;
-        this.creatorID;
         this.state = {
             tags: "",
             isSending: false,
             isSent: false,
-            isReplying: false
         }
         this._sendPublicMessage = this._sendPublicMessage.bind(this);
     }
@@ -43,7 +41,7 @@ export default class PublicScreen extends Component {
                 setTimeout(() => {
                     this.setState({
                         isSent: false,
-                        recipientEmail: "",
+                        tags: "",
                         isPlaybackAllowed: false
                     });
                 }, 1000);
@@ -68,14 +66,19 @@ export default class PublicScreen extends Component {
 
     render() {
         const params = this.props.screenProps;
-        const creatorID = params ? params.creatorID || "" : "";
-        this.creatorID = creatorID;
-        const isReplying = params.isReplying;
-        this.reloadRecorder = params.reloadRecorder;
-        this.recording = params.recording;
+        this.reloadRecorder = params ? params.reloadRecorder : this.props.reloadRecorder;
+        const messageID = params ? params.messageID : this.props.messageID;
+        this.recording = this.props.recording;
 
         return (
             <View>
+                <View style={messageID === "" ? styles.resetButtonContainerWithoutMessageID : styles.resetButtonContainerWithMessageID}>
+                    {messageID !== "" && <Button
+                        title="Reset"
+                        onPress={this.reloadRecorder}
+                        style={styles.resetButton}
+                    />}
+                </View>
                 <TextInput
                         id="tags"
                         style={styles.tags}
@@ -128,7 +131,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         fontSize: 20,
         paddingLeft: 10,
-        marginTop: 38
+        // marginTop: 38
     },
     removed: {
         display: "none"
@@ -139,7 +142,8 @@ const styles = StyleSheet.create({
     },
     replyingTo: {
         marginTop: 10,
-        fontSize: 20
+        fontSize: 20,
+        marginBottom: 5
     },
     replyingToCreatorID: {
         height: BUTTON_HEIGHT,
@@ -148,6 +152,19 @@ const styles = StyleSheet.create({
         fontSize: 20,
         paddingTop: 10,
         paddingLeft: 10
+    },
+    resetButton: {
+
+    },
+    resetButtonContainerWithMessageID: {
+        paddingTop: 57,
+        flexDirection: "row",
+        justifyContent: "flex-end"
+    },
+    resetButtonContainerWithoutMessageID: {
+        paddingTop: 39,
+        flexDirection: "row",
+        justifyContent: "flex-end"
     },
     sendButtonContainer: {
         marginTop: 30

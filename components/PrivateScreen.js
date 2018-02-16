@@ -18,7 +18,6 @@ export default class PrivateScreen extends Component {
             recipientEmail: "",
             isSending: false,
             isSent: false,
-            isReplying: false
         }
         this._sendPrivateMessage = this._sendPrivateMessage.bind(this);
     }
@@ -68,29 +67,52 @@ export default class PrivateScreen extends Component {
 
     render() {
         const params = this.props.screenProps;
-        const creatorID = params ? params.creatorID || "" : "";
+        const creatorID = params ? params.creatorID || "" : this.props.creatorID;
         this.creatorID = creatorID;
-        const isReplying = params.isReplying;
-        this.reloadRecorder = params.reloadRecorder;
-        this.recording = params.recording;
+        const messageID = params ? params.messageID || "" : "";
+        this.reloadRecorder = params ? params.reloadRecorder : this.props.reloadRecorder;
+        var that = this;
+        this.recording = params ? params.recording : this.props.recording;
 
         return (
             <View>
                 <View>
-                    {!isReplying && (
-                        <TextInput
-                            id="recipient-email"
-                            style={styles.recipientInput}
-                            placeholder="Recipient email here"
-                            value={this.props.recipientEmail}
-                            onChangeText={text => {
-                                this.setState({ recipientEmail: text });
-                            }}
-                        />
-                    )}
-                    {isReplying && (
+                    {creatorID === "" && messageID !== "" && (
                         <View>
                             <View style={styles.replyButtons}>
+                                <Text style={styles.replyingTo}>
+                                    Replying To:
+                                </Text>
+                                <Button
+                                    title="Reset"
+                                    onPress={this.reloadRecorder}
+                                />
+                            </View>
+                            <TextInput
+                                id="recipient-email"
+                                style={styles.recipientInput}
+                                value="Anonymous Recipient"
+                            />
+                        </View>
+                    )}
+                    {creatorID === "" && messageID === "" && (
+                        <View>
+                            <View style={styles.replyButtons}>
+                                <Text style={styles.replyingTo}>
+                                    Replying To:
+                                </Text>
+                            </View>
+                            <TextInput
+                                id="recipient-email"
+                                style={styles.recipientInput}
+                                value={this.state.recipientEmail}
+                                onPress={(text) => { this.setState({recipientEmail: text})}}
+                            />
+                        </View>
+                    )}
+                    {creatorID !== "" && (
+                        <View>
+                            <View style={styles.privateReplyButtons}>
                                 <Text style={styles.replyingTo}>
                                     Replying To:
                                 </Text>
@@ -142,14 +164,17 @@ export default class PrivateScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-
+    privateReplyButtons: {
+        marginTop: 56,
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
     recipientInput: {
         height: BUTTON_HEIGHT,
         borderWidth: 1,
         borderRadius: 5,
         fontSize: 20,
         paddingLeft: 10,
-        marginTop: 38
     },
     removed: {
         display: "none"
@@ -160,7 +185,8 @@ const styles = StyleSheet.create({
     },
     replyingTo: {
         marginTop: 10,
-        fontSize: 20
+        fontSize: 20,
+        marginBottom: 5
     },
     replyingToCreatorID: {
         height: BUTTON_HEIGHT,

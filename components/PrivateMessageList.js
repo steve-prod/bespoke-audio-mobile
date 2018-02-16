@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
     inboxText: {
         paddingVertical: 10,
         marginLeft: 20,
-        alignContent: "center",
         fontSize: FONT_SIZE
     },
     noMessages: {
