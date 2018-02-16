@@ -15,15 +15,12 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 const BUTTON_HEIGHT = 50;
 
 const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get("window");
-const DISABLED_OPACITY = 0.5;
 const FONT_SIZE = 14;
 const BUFFERING_STRING = "...buffering...";
-const BACKGROUND_COLOR = "#FFF8ED";
 
 export default class PrivateMessage extends Component {
     constructor(props) {
         super(props);
-        this.index = 0;
         this.isSeeking = false;
         this.shouldPlayAtEndOfSeek = false;
         this.playbackInstance = null;
@@ -58,7 +55,8 @@ export default class PrivateMessage extends Component {
             uri: "https://bespoke-audio.com/audio/" + this.props.messageID
         };
         const initialStatus = {
-            shouldPlay: false
+            shouldPlay: false,
+            progressUpdateIntervalMillis: 10
             // // UNCOMMENT THIS TO TEST THE OLD androidImplementation:
             // androidImplementation: 'MediaPlayer',
         };

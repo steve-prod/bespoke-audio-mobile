@@ -110,7 +110,7 @@ export default class PrivateScreen extends Component {
                         !this.state.isSending &&
                         !this.state.isSent && (
                             <Button
-                                title={"Send Message"}
+                                title={"Send Private Message"}
                                 size={BUTTON_HEIGHT}
                                 onPress={this._sendPrivateMessage}
                                 disabled={this.state.isLoading}

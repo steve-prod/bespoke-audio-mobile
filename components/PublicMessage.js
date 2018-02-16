@@ -15,9 +15,7 @@ import base64 from "base-64";
 const BUTTON_HEIGHT = 50;
 
 const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get("window");
-const DISABLED_OPACITY = 0.5;
 const FONT_SIZE = 14;
-const LOADING_STRING = "... loading ...";
 const BUFFERING_STRING = "...buffering...";
 
 export default class PublicMessage extends Component {
@@ -25,17 +23,15 @@ export default class PublicMessage extends Component {
         super(props);
         this.isSeeking = false;
         this.shouldPlayAtEndOfSeek = false;
+        this.playbackInstance = null
         var tags = base64.decode(this.props.tags).replace(/'/g, '"');
         tags = tags
             .slice(2, tags.length - 2)
             .split(",")
+            .map((val) => '#' + val)
             .join(", ");
         this.state = {
-            info: "",
             shouldPlay: false,
-            shouldCorrectPitch: true,
-            playbackInstance: null,
-            playbackInstanceName: LOADING_STRING,
             playbackInstancePosition: 0,
             playbackInstanceDuration: 0,
             isPlaying: false,
@@ -45,7 +41,6 @@ export default class PublicMessage extends Component {
     }
 
     componentDidMount() {
-        this.getAndSetMessageAudio();
         Audio.setAudioModeAsync({
             allowsRecordingIOS: false,
             interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
@@ -53,18 +48,15 @@ export default class PublicMessage extends Component {
             shouldDuckAndroid: true,
             interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX
         });
+        this._loadNewPlaybackInstance();
     }
 
-    async getAndSetMessageAudio() {
+    async _loadNewPlaybackInstance() {
         const source = {
-            uri:
-                "https://bespoke-audio.com/audio/" +
-                this.props.messageID +
-                ".mp3"
+            uri: "https://bespoke-audio.com/audio/" + this.props.messageID
         };
         const initialStatus = {
             shouldPlay: false,
-            shouldCorrectPitch: this.state.shouldCorrectPitch,
             progressUpdateIntervalMillis: 10
             // // UNCOMMENT THIS TO TEST THE OLD androidImplementation:
             // androidImplementation: 'MediaPlayer',
@@ -75,61 +67,64 @@ export default class PublicMessage extends Component {
                 initialStatus,
                 this._onPlaybackStatusUpdate
             );
-            this.setState({
-                isBuffering: false,
-                playbackInstance: sound,
-                playbackInstanceDuration: Math.floor(
-                    status.playableDurationMillis / 1000
-                )
-            });
+            this.playbackInstance = sound;
         } catch (e) {
-            // this.setState({info: JSON.stringify(e)});
+            console.log(e);
         }
     }
 
     _onPlaybackStatusUpdate = status => {
-        this.setState({
-            playbackInstancePosition: status.positionMillis / 1000,
-            isPlaying: status.isPlaying,
-            isBuffering: status.isBuffering,
-            shouldCorrectPitch: status.shouldCorrectPitch
-        });
+        if (status.isLoaded) {
+            this.setState({
+                playbackInstancePosition: status.positionMillis,
+                playbackInstanceDuration: status.durationMillis,
+                shouldPlay: status.shouldPlay,
+                isPlaying: status.isPlaying,
+                isBuffering: status.isBuffering
+            });
+            if (status.didJustFinish) {
+                this.playbackInstance.stopAsync();
+            }
+        } else {
+            if (status.error) {
+                console.log(`FATAL PLAYER ERROR: ${status.error}`);
+            }
+        }
     };
 
-    _onLoadStart = () => {
-        console.log(`ON LOAD START`);
-    };
-
-    _onLoad = status => {
-        console.log(`ON LOAD : ${JSON.stringify(status)}`);
-    };
-
-    _onError = error => {
-        console.log(`ON ERROR : ${error}`);
-    };
-
-    _onStopPressed = () => {
-        if (this.state.playbackInstance != null) {
-            this.state.playbackInstance.stopAsync();
+    _onPlayPausePressed = () => {
+        if (this.playbackInstance != null) {
+            if (this.state.isPlaying) {
+                this.playbackInstance.pauseAsync();
+            } else {
+                this.playbackInstance.playAsync();
+            }
         }
     };
 
     _onSeekSliderValueChange = value => {
-        if (!this.state.isSeeking) {
+        if (this.playbackInstance != null && !this.isSeeking) {
             this.isSeeking = true;
-            this.state.playbackInstance.pauseAsync();
+            this.shouldPlayAtEndOfSeek = this.state.shouldPlay;
+            this.playbackInstance.pauseAsync();
         }
     };
 
     _onSeekSliderSlidingComplete = async value => {
-        this.isSeeking = false;
-        const seekPosition = value * this.state.playbackInstanceDuration;
-        this.state.playbackInstance.setPositionAsync(seekPosition);
+        if (this.playbackInstance != null) {
+            this.isSeeking = false;
+            const seekPosition = value * this.state.playbackInstanceDuration;
+            if (this.shouldPlayAtEndOfSeek) {
+                this.playbackInstance.playFromPositionAsync(seekPosition);
+            } else {
+                this.playbackInstance.setPositionAsync(seekPosition);
+            }
+        }
     };
 
     _getSeekSliderPosition() {
         if (
-            this.state.playbackInstance != null &&
+            this.playbackInstance != null &&
             this.state.playbackInstancePosition != null &&
             this.state.playbackInstanceDuration != null
         ) {
@@ -158,7 +153,7 @@ export default class PublicMessage extends Component {
 
     _getTimestamp() {
         if (
-            this.state.playbackInstance != null &&
+            this.playbackInstance != null &&
             this.state.playbackInstancePosition != null &&
             this.state.playbackInstanceDuration != null
         ) {
@@ -168,8 +163,19 @@ export default class PublicMessage extends Component {
                 this.state.playbackInstanceDuration
             )}`;
         }
-        return this.state.playbackInstancePosition;
+        return (
+            "00:00 / " +
+            this._getMMSSFromMillis(this.state.playbackInstanceDuration)
+        );
     }
+
+    // _updatePublicMessageList() {
+    //     this.props.onPublicMessageListChange();
+    // }
+    //
+    // _reply(creatorID) {
+    //     this.props.onReplyPressed(creatorID);
+    // }
 
     render() {
         return (
@@ -183,12 +189,7 @@ export default class PublicMessage extends Component {
                             style={styles.playerButton}
                             name="ios-play"
                             size={BUTTON_HEIGHT}
-                            onPress={() => {
-                                if (!this.state.isPlaying) {
-                                    this.setState({ isPlaying: true });
-                                    this.state.playbackInstance.playAsync();
-                                }
-                            }}
+                            onPress={this._onPlayPausePressed}
                         />
                     )}
                     {this.state.isPlaying && (
@@ -196,10 +197,7 @@ export default class PublicMessage extends Component {
                             style={styles.playerButton}
                             name="ios-pause"
                             size={BUTTON_HEIGHT}
-                            onPress={() => {
-                                this.setState({ isPlaying: false });
-                                this.state.playbackInstance.pauseAsync();
-                            }}
+                            onPress={this._onPlayPausePressed}
                         />
                     )}
                     {this.state.isBuffering && (
@@ -210,10 +208,7 @@ export default class PublicMessage extends Component {
                     {!this.state.isBuffering && (
                         <Slider
                             style={styles.playerSlider}
-                            value={
-                                this.state.playbackInstancePosition /
-                                this.state.playbackInstanceDuration
-                            }
+                            value={this._getSeekSliderPosition()}
                             onValueChange={this._onSeekSliderValueChange}
                             onSlidingComplete={
                                 this._onSeekSliderSlidingComplete
@@ -222,9 +217,20 @@ export default class PublicMessage extends Component {
                         />
                     )}
                     <Text style={styles.playerTracking}>
-                        {Math.floor(this.state.playbackInstancePosition)} /{" "}
-                        {this.state.playbackInstanceDuration}
+                        {this._getTimestamp()}
                     </Text>
+                </View>
+                <View style={styles.publicMessageButtonContainer}>
+                    <Button
+                        title="Reply Privately"
+                        onPress={() => alert("Reply Privately")}
+                    />
+                    <Button
+                        title="Reply Publicly"
+                        onPress={() => alert("Reply Publicly")}
+                        style={styles.deleteButton}
+                        color="red"
+                    />
                 </View>
             </View>
         );
@@ -258,5 +264,9 @@ const styles = StyleSheet.create({
     },
     playerTracking: {
         minHeight: FONT_SIZE
+    },
+    publicMessageButtonContainer: {
+        flexDirection: "row",
+        justifyContent: "space-around"
     }
 });

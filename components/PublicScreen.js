@@ -1,30 +1,164 @@
 import React, { Component } from "react";
 import {
+    Button,
     StyleSheet,
-    Text
+    Text,
+    TextInput,
+    View
 } from "react-native";
 
-const BACKGROUND_COLOR = "#FFF8ED";
+const BUTTON_HEIGHT = 50;
 
 export default class PublicScreen extends Component {
     constructor(props) {
         super(props);
-
+        this.recording;
+        this.creatorID;
+        this.state = {
+            tags: "",
+            isSending: false,
+            isSent: false,
+            isReplying: false
+        }
+        this._sendPublicMessage = this._sendPublicMessage.bind(this);
     }
 
-    static navigationOptions = ({ navigation, navigationOptions }) => {
-        return {
-            tabBarOptions: {
-                activeBackgroundColor: "#FFF8ED",
-                inactiveBackgroundColor: "#FFF8ED"
+    _sendPublicMessage() {
+        var that = this;
+        var formData = new FormData();
+        formData.append("blob", {
+            uri: that.recording.getURI(),
+            name: "blob",
+            type: "audio/x-caf"
+        });
+        formData.append("tags", that.state.tags);
+        formData.append("isPublic", true);
+        var publishMessageXHR = new XMLHttpRequest();
+        publishMessageXHR.addEventListener("load", event => {
+            if (event.target.status === 201) {
+                this.setState({
+                    isSending: false,
+                    isSent: true
+                });
+                setTimeout(() => {
+                    this.setState({
+                        isSent: false,
+                        recipientEmail: "",
+                        isPlaybackAllowed: false
+                    });
+                }, 1000);
+                this.recording = null;
+                this.sound = null;
+                this.reloadRecorder();
+            } else {
+                this.setState({ isSending: false });
+                // TODO: indicate message send failure
             }
-        };
-    };
+        });
+        publishMessageXHR.addEventListener("error", function(event) {
+            this.setState({ isSending: false });
+            // TODO: alert user login failed
+            alert(event.target.status);
+            alert("XHR Error: eventMessage");
+        });
+        publishMessageXHR.open("POST", "https://bespoke-audio.com/messages");
+        publishMessageXHR.send(formData);
+        this.setState({ isSending: true });
+    }
 
     render() {
-        
+        const params = this.props.screenProps;
+        const creatorID = params ? params.creatorID || "" : "";
+        this.creatorID = creatorID;
+        const isReplying = params.isReplying;
+        this.reloadRecorder = params.reloadRecorder;
+        this.recording = params.recording;
+
         return (
-            <Text>Public Screen</Text>
+            <View>
+                <TextInput
+                        id="tags"
+                        style={styles.tags}
+                        placeholder="#tags #here"
+                        value={this.state.tags}
+                        onChangeText={text => {
+                            this.setState({ tags: text });
+                        }}
+                />
+                <View style={styles.sendButtonContainer}>
+                    {!this.state.isSending &&
+                        !this.state.isSent && (
+                            <Button
+                                title={"Publicly Publish Message"}
+                                size={BUTTON_HEIGHT}
+                                onPress={this._sendPublicMessage}
+                                disabled={this.state.isLoading}
+                                style={styles.sendPublicMessageButton}
+                            />
+                        )}
+                    <Text
+                        style={
+                            this.state.isSending
+                                ? styles.sendingBanner
+                                : styles.removed
+                        }
+                    >
+                        Sending...
+                    </Text>
+                    <Text
+                        style={
+                            this.state.isSent
+                                ? styles.sentBanner
+                                : styles.removed
+                        }
+                    >
+                        Message Sent
+                    </Text>
+                </View>
+            </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+
+    tags: {
+        height: BUTTON_HEIGHT,
+        borderWidth: 1,
+        borderRadius: 5,
+        fontSize: 20,
+        paddingLeft: 10,
+        marginTop: 38
+    },
+    removed: {
+        display: "none"
+    },
+    replyButtons: {
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+    replyingTo: {
+        marginTop: 10,
+        fontSize: 20
+    },
+    replyingToCreatorID: {
+        height: BUTTON_HEIGHT,
+        borderWidth: 1,
+        borderRadius: 5,
+        fontSize: 20,
+        paddingTop: 10,
+        paddingLeft: 10
+    },
+    sendButtonContainer: {
+        marginTop: 30
+    },
+    sendPublicMessageButton: {},
+    sendingBanner: {
+        color: "yellow",
+        alignSelf: "center"
+    },
+    sentBanner: {
+        color: "green",
+        alignSelf: "center"
+    }
+});
