@@ -68,7 +68,7 @@ export default class PublicScreen extends Component {
         const params = this.props.screenProps;
         this.reloadRecorder = params ? params.reloadRecorder : this.props.reloadRecorder;
         const messageID = params ? params.messageID : this.props.messageID;
-        this.recording = this.props.recording;
+        this.recording = params ? params.recording : this.props.recording;
 
         return (
             <View>

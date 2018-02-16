@@ -67,7 +67,7 @@ export default class InboxScreen extends Component {
     };
 
     _reply(creatorID) {
-        this.props.navigation.navigate("Recorder", { creatorID: creatorID, messageID: "" });
+        this.props.navigation.navigate("Recorder", { creatorID: creatorID, messageID: "", isPublic: false });
     }
 
     render() {

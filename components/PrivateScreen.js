@@ -14,6 +14,7 @@ export default class PrivateScreen extends Component {
         super(props);
         this.recording;
         this.creatorID;
+        this.messageID;
         this.state = {
             recipientEmail: "",
             isSending: false,
@@ -33,7 +34,9 @@ export default class PrivateScreen extends Component {
         formData.append("recipient", that.creatorID || that.state.recipientEmail);
         formData.append("isPublic", false);
         var sendMessageXHR = new XMLHttpRequest();
-        sendMessageXHR.addEventListener("load", event => {
+        sendMessageXHR.addEventListener("load", (event) => {
+            that.creatorID = "";
+            that.messageID = "";
             if (event.target.status === 201) {
                 this.setState({
                     isSending: false,
@@ -51,6 +54,7 @@ export default class PrivateScreen extends Component {
                 this.reloadRecorder();
             } else {
                 this.setState({ isSending: false });
+                console.log(event);
                 // TODO: indicate message send failure
             }
         });
@@ -60,7 +64,12 @@ export default class PrivateScreen extends Component {
             alert(event.target.status);
             alert("XHR Error: eventMessage");
         });
-        sendMessageXHR.open("POST", "https://bespoke-audio.com/messages");
+        if ((this.creatorID === "" && this.messageID === "") ||
+                this.creatorID !== "") {
+            sendMessageXHR.open("POST", "https://bespoke-audio.com/messages");
+        } else {
+            sendMessageXHR.open("POST", "https://bespoke-audio.com/reply/" + this.messageID);
+        }
         sendMessageXHR.send(formData);
         this.setState({ isSending: true });
     }
@@ -70,8 +79,8 @@ export default class PrivateScreen extends Component {
         const creatorID = params ? params.creatorID || "" : this.props.creatorID;
         this.creatorID = creatorID;
         const messageID = params ? params.messageID || "" : "";
+        this.messageID = messageID;
         this.reloadRecorder = params ? params.reloadRecorder : this.props.reloadRecorder;
-        var that = this;
         this.recording = params ? params.recording : this.props.recording;
 
         return (
@@ -99,14 +108,15 @@ export default class PrivateScreen extends Component {
                         <View>
                             <View style={styles.replyButtons}>
                                 <Text style={styles.replyingTo}>
-                                    Replying To:
+                                    Send To:
                                 </Text>
                             </View>
                             <TextInput
                                 id="recipient-email"
                                 style={styles.recipientInput}
                                 value={this.state.recipientEmail}
-                                onPress={(text) => { this.setState({recipientEmail: text})}}
+                                onChangeText={(text) => {
+                                    this.setState({recipientEmail: text})}}
                             />
                         </View>
                     )}

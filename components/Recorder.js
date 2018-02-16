@@ -380,13 +380,9 @@ export default class Recorder extends Component {
                     </View>
                 </View>
                 {this.props.creatorID !== "" &&
-                    // <StatusNavigator screenProps={
-                    //     {creatorID: this.props.creatorID,
-                    //     messageID: "",
-                    //     recording: this.recording,
-                    //     reloadRecorder: this._reloadRecorder}} />
                     <PrivateScreen
                         creatorID={this.props.creatorID}
+                        messageID=""
                         reloadRecorder={this._reloadRecorder}
                         recording={this.recording}
                     />
