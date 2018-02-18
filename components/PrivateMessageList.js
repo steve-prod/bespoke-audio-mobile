@@ -113,6 +113,6 @@ const styles = StyleSheet.create({
         justifyContent: "space-between"
     },
     tabMenuBuffer: {
-        // height: 40
+
     }
 });
