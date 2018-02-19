@@ -75,7 +75,7 @@ export default class PrivateMessageList extends Component {
                                 onReplyPressed={creatorID =>
                                     this._reply(creatorID)
                                 }
-                                onPrivateMessageListChange={
+                                onPrivateMessagesListChange={
                                     this._updatePrivateMessagesList
                                 }
                             />

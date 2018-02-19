@@ -33,7 +33,7 @@ export default class PrivateMessage extends Component {
             isBuffering: true
         };
         this._deleteMessage = this._deleteMessage.bind(this);
-        this._updatePrivateMessageList = this._updatePrivateMessageList.bind(
+        this._updatePrivateMessagesList = this._updatePrivateMessagesList.bind(
             this
         );
         this._reply = this._reply.bind(this);
@@ -172,7 +172,7 @@ export default class PrivateMessage extends Component {
         var deleteXHR = new XMLHttpRequest();
         deleteXHR.addEventListener("load", event => {
             if (event.target.status === 204) {
-                this._updatePrivateMessageList();
+                this._updatePrivateMessagesList();
             } else {
                 // TODO: alert user login failed
                 alert(event.target.responseText);
@@ -189,12 +189,30 @@ export default class PrivateMessage extends Component {
         deleteXHR.send();
     }
 
-    _updatePrivateMessageList() {
-        this.props.onPrivateMessageListChange();
+    _updatePrivateMessagesList() {
+        this.props.onPrivateMessagesListChange();
     }
 
     _reply(creatorID) {
         this.props.onReplyPressed(creatorID);
+    }
+
+    _block(creatorID) {
+        var blockXHR = new XMLHttpRequest();
+        blockXHR.addEventListener("load", (event) => {
+            if (event.target.status === 201) {
+                this._updatePrivateMessagesList();
+            } else {
+                // TODO: alert user login failed
+                alert(event.target.responseText);
+            }
+        });
+        blockXHR.addEventListener("error", function(event) {
+            // TODO: alert user login failed
+            alert(event.target.status);
+        });
+        blockXHR.open("POST", "https://bespoke-audio.com/blocks/" + creatorID);
+        blockXHR.send();
     }
 
     render() {
@@ -251,6 +269,12 @@ export default class PrivateMessage extends Component {
                         style={styles.deleteButton}
                         color="red"
                     />
+                    <Button
+                        title="Block User"
+                        onPress={() => this._block(this.props.creatorID)}
+                    />
+                </View>
+                <View style={styles.privateMessageButtonContainer}>
                 </View>
             </View>
         );
@@ -259,7 +283,7 @@ export default class PrivateMessage extends Component {
 
 const styles = StyleSheet.create({
     fromContainer: {
-        // marginLeft: 10
+
     },
     messageContainer: {
         paddingTop: 20,

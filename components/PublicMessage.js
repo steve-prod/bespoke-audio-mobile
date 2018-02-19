@@ -177,6 +177,24 @@ export default class PublicMessage extends Component {
         this.props.onReplyPubliclyPressed(messageID);
     }
 
+    _flag(messageID) {
+        var flagXHR = new XMLHttpRequest();
+        flagXHR.addEventListener("load", (event) => {
+            if (event.target.status === 201) {
+                this.props.onFlaggedChange();
+            } else {
+                // TODO: alert user login failed
+                alert(event.target.responseText);
+            }
+        });
+        flagXHR.addEventListener("error", function(event) {
+            // TODO: alert user login failed
+            alert(event.target.status);
+        });
+        flagXHR.open("POST", "https://bespoke-audio.com/flags/" + messageID);
+        flagXHR.send();
+    }
+
     render() {
         return (
             <View style={styles.messageContainer}>
@@ -230,6 +248,13 @@ export default class PublicMessage extends Component {
                         onPress={() => this._replyPublicly(this.props.messageID)}
                         style={styles.deleteButton}
                         color="red"
+                    />
+                    <Button
+                        title={this.props.isFlagged ? "Flagged" : "Flag"}
+                        onPress={() => {
+                            this._flag(this.props.messageID)
+                        }}
+                        disabled={this.props.isFlagged}
                     />
                 </View>
             </View>

@@ -54,7 +54,6 @@ export default class PrivateScreen extends Component {
                 this.reloadRecorder();
             } else {
                 this.setState({ isSending: false });
-                console.log(event);
                 // TODO: indicate message send failure
             }
         });

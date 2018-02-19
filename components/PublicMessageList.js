@@ -5,16 +5,20 @@ import { Button,
     Text,
     View } from "react-native";
 import PublicMessage from "./PublicMessage.js";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const BACKGROUND_COLOR = "#FFF8ED";
 const FONT_SIZE = 20;
+const BUTTON_HEIGHT = 50;
 
 export default class PrivateMessageList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            messages: []
+            messages: [],
+            isFilter: true
         };
+        this._updatePublicMessagesList = this._updatePublicMessagesList.bind(this);
     }
 
     componentDidMount() {
@@ -64,21 +68,38 @@ export default class PrivateMessageList extends Component {
                     <Button
                         title="Refresh"
                         onPress={() => this._updatePublicMessagesList()}
-                        style={styles.resfreshButton}
+                        style={styles.refreshButton}
                     />
+                </View>
+                <View style={styles.filterContainer}>
+                    <Ionicons
+                        name={this.state.isFilter ? "ios-checkbox-outline" : "ios-square-outline"}
+                        size={FONT_SIZE}
+                        style={styles.filterButton}
+                        color={this.state.isFilter ? 'blue' : 'red'}
+                        onPress={() => {
+                            this.setState({isFilter: !this.state.isFilter});
+                            this.getMessages();
+                        }}
+                    />
+                    <Text style={styles.filterText}>Filter content flagged as objectionable</Text>
                 </View>
                 <FlatList
                     style={styles.publicMessagesList}
                     data={this.state.messages}
                     keyExtractor={(item, index) => item.messageID}
-                    renderItem={({ item }) => (
-                        <PublicMessage
-                            messageID={item.messageID}
-                            tags={item.tags}
-                            onReplyPrivatelyPressed={(messageID) =>this._replyPrivately(messageID)}
-                            onReplyPubliclyPressed={(messageID) =>this._replyPublicly(messageID)}
-                        />
-                    )}
+                    renderItem={({ item }) => {
+                        if (!this.state.isFilter || !item.isFlagged) {
+                            return (<PublicMessage
+                                messageID={item.messageID}
+                                tags={item.tags}
+                                isFlagged={item.isFlagged}
+                                onFlaggedChange={this._updatePublicMessagesList}
+                                onReplyPrivatelyPressed={(messageID) =>this._replyPrivately(messageID)}
+                                onReplyPubliclyPressed={(messageID) =>this._replyPublicly(messageID)}
+                            />)
+                        }
+                    }}
                 />
                 <View style={styles.tabMenuBuffer} />
             </View>
@@ -91,6 +112,18 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         marginLeft: 20,
         fontSize: FONT_SIZE
+    },
+    filterContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        paddingLeft: 20,
+        alignContent: 'center'
+    },
+    filterButton: {
+
+    },
+    filterText: {
+        marginLeft: 10
     },
     publicMessagesList: {
         borderTopWidth: 1
