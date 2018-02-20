@@ -6,13 +6,13 @@
    "slug": "bespoke-audio",
    "sdkVersion": "25.0.0",
    "ios": {
-     "bundleIdentifier": "com.bespoke-audio.app",
+     "bundleIdentifier": "com.bespoke-audio.ios.app",
      "infoPlist": {
-         "NSMicrophoneUsageDescription": "This app uses the microphone to record audio messages that maybe sent privately to an individual or published publicly for any user to listen to."
+         "NSMicrophoneUsageDescription": "This app uses the microphone to record audio messages that may be sent privately to an individual or published publicly for any user to listen to."
      }
    },
    "android": {
-     "package": "com.bespoke_audio.app"
+     "package": "com.bespoke_audio.android.app"
    }
   }
 }
