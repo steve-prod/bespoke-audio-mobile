@@ -22,6 +22,27 @@ const BACKGROUND_COLOR = "#FFF8ED";
 const LIVE_COLOR = "#FF0000";
 const DISABLED_OPACITY = 0.5;
 
+const recordingOptions = {
+  android: {
+    extension: '.3gp',
+    outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_THREE_GPP,
+    audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AMR_NB,
+    sampleRate: 44100,
+    numberOfChannels: 2,
+    bitRate: 128000,
+  },
+  ios: {
+    extension: '.wav',
+    outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_LINEARPCM,
+    sampleRate: 44100,
+    numberOfChannels: 2,
+    bitRate: 128000,
+    linearPCMBitDepth: 16,
+    linearPCMIsBigEndian: false,
+    linearPCMIsFloat: false,
+  },
+};
+
 const StatusNavigator = TabNavigator({
     Private: {screen: PrivateScreen},
     Public: {screen: PublicScreen}
@@ -65,9 +86,7 @@ export default class Recorder extends Component {
             isRecording: false,
             shouldCorrectPitch: true,
         };
-        this.recordingSettings = JSON.parse(
-            JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY)
-        );
+        this.recordingSettings = recordingOptions;
         this._reloadRecorder = this._reloadRecorder.bind(this);
         // // UNCOMMENT THIS TO TEST maxFileSize:
         // this.recordingSettings.android['maxFileSize'] = 12000;

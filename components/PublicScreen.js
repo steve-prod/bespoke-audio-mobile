@@ -27,7 +27,7 @@ export default class PublicScreen extends Component {
         formData.append("blob", {
             uri: that.recording.getURI(),
             name: "blob",
-            type: "audio/x-caf"
+            type: "audio/mpeg"
         });
         formData.append("tags", that.state.tags);
         formData.append("isPublic", true);

@@ -55,6 +55,7 @@ export default class PrivateScreen extends Component {
             } else {
                 this.setState({ isSending: false });
                 // TODO: indicate message send failure
+                console.log(event.target.responseText);
             }
         });
         sendMessageXHR.addEventListener("error", function(event) {

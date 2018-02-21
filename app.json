@@ -1,8 +1,8 @@
 {
   "expo": {
-   "name": "Bespoke-Audio",
+   "name": "Bespoke Audio",
    "icon": "./favicon.png",
-   "version": "0.1.2",
+   "version": "0.1.5",
    "slug": "bespoke-audio",
    "sdkVersion": "25.0.0",
    "ios": {
