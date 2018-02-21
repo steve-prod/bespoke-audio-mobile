@@ -130,8 +130,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         fontSize: 20,
-        paddingLeft: 10,
-        // marginTop: 38
+        paddingLeft: 10
     },
     removed: {
         display: "none"

@@ -137,6 +137,10 @@ export default class Recorder extends Component {
                 isRecording: status.isRecording,
                 recordingDuration: status.durationMillis
             });
+            if (status.isRecording && status.durationMillis > 60000) {
+                this._stopRecordingAndEnablePlayback();
+                alert("Recorder stopped after 60 seconds");
+            }
         } else if (status.isDoneRecording) {
             this.setState({
                 isRecording: false,

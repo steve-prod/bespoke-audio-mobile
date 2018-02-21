@@ -63,9 +63,10 @@ export default class RecorderScreen extends Component {
 
         return (
             <View style={styles.recorderScreen}>
-                <View style={styles.recorderText}>
-                    <Text>Recorder</Text>
+                <View >
+                    <Text style={styles.recorderHeader}>Recorder</Text>
                 </View>
+                <Text style={styles.recorderText}>(Messages may be up to 60 seconds long)</Text>
                 <Recorder
                     creatorID={creatorID}
                     messageID={messageID}
@@ -82,8 +83,13 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: BACKGROUND_COLOR
     },
+    recorderHeader: {
+        paddingVertical: 10,
+        alignSelf: "center",
+        fontSize: 25
+    },
     recorderText: {
         paddingVertical: 10,
-        alignSelf: "center"
+        alignSelf: "center"        
     }
 });
