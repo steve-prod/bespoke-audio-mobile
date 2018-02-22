@@ -115,6 +115,7 @@ export default class PrivateScreen extends Component {
                                 id="recipient-email"
                                 style={styles.recipientInput}
                                 value={this.state.recipientEmail}
+                                placeholder="Recipient Email"
                                 onChangeText={(text) => {
                                     this.setState({recipientEmail: text})}}
                             />
