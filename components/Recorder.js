@@ -209,7 +209,7 @@ export default class Recorder extends Component {
             {
                 isLooping: false,
                 shouldCorrectPitch: this.state.shouldCorrectPitch,
-                progressUpdateIntervalMillis: 10
+                progressUpdateIntervalMillis: 50
             },
             this._updateScreenForSoundStatus
         );
@@ -309,7 +309,6 @@ export default class Recorder extends Component {
     }
 
     render() {
-        var that = this;
         return !this.state.hasRecordingPermissions ? (
             <View style={styles.recorderContainer}>
                 <Text style={[styles.noPermissionsText]}>
