@@ -127,6 +127,7 @@ export default class SignupScreen extends Component {
                                 this.setState({ password: password })
                             }
                         />
+                        <Text style={styles.passwordRegex}>Password may contain letters, numbers, spaces and !@#$%^&*-._+</Text>
                         <View style={styles.complianceContainer}>
                             <Ionicons
                                 name={this.state.isAgree ? "ios-checkbox-outline" : "ios-square-outline"}
@@ -214,6 +215,9 @@ const styles = StyleSheet.create({
     },
     eulaHeader: {
         alignSelf: 'center'
+    },
+    passwordRegex: {
+        marginHorizontal: 50
     },
     signup: {
         flex: 1,
